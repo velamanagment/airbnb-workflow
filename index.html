@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Airbnb Management Workflow</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #0a0a0a; color: #f0f0f0; min-height: 100vh; }
+
+    /* HEADER */
+    .header { padding: 32px 24px 20px; text-align: center; border-bottom: 1px solid #1a1a1a; }
+    .header h1 { font-size: 24px; color: #fff; margin-bottom: 4px; }
+    .header p { color: #555; font-size: 13px; }
+    .stats { display: flex; justify-content: center; gap: 32px; margin-top: 20px; }
+    .stat { text-align: center; }
+    .stat-val { font-size: 22px; font-weight: 700; }
+    .stat-label { font-size: 11px; color: #555; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* LAYOUT */
+    .layout { display: flex; height: calc(100vh - 140px); }
+
+    /* SIDEBAR */
+    .sidebar { width: 260px; border-right: 1px solid #1a1a1a; overflow-y: auto; flex-shrink: 0; padding: 16px 0; }
+    .sidebar-label { font-size: 10px; color: #444; text-transform: uppercase; letter-spacing: 1px; padding: 0 16px 8px; }
+    .stage-btn {
+      width: 100%; text-align: left; background: none; border: none;
+      padding: 12px 16px; cursor: pointer; display: flex; align-items: center;
+      gap: 12px; transition: background 0.15s; color: #f0f0f0;
+    }
+    .stage-btn:hover { background: #141414; }
+    .stage-btn.active { background: #1a1a1a; border-right: 2px solid var(--c); }
+    .stage-icon {
+      width: 32px; height: 32px; border-radius: 8px; display: flex;
+      align-items: center; justify-content: center; font-size: 14px;
+      background: var(--bg); color: var(--c); flex-shrink: 0;
+    }
+    .stage-info { flex: 1; min-width: 0; }
+    .stage-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .stage-sub { font-size: 11px; color: #555; margin-top: 1px; }
+    .stage-status { width: 8px; height: 8px; border-radius: 50%; background: #2a2a2a; flex-shrink: 0; }
+    .stage-status.done { background: #4ade80; }
+    .stage-status.active-s { background: #facc15; }
+
+    /* MAIN */
+    .main { flex: 1; overflow-y: auto; padding: 28px 32px; }
+    .panel { display: none; }
+    .panel.visible { display: block; }
+
+    .panel-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+    .panel-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; background: var(--bg); flex-shrink: 0; }
+    .panel-title { font-size: 22px; font-weight: 700; color: var(--c); }
+    .panel-desc { font-size: 14px; color: #888; margin-top: 4px; line-height: 1.5; }
+
+    /* TOOLS GRID */
+    .section-label { font-size: 11px; color: #444; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+    .tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 28px; }
+    .tool-card {
+      background: #111; border: 1px solid #1e1e1e; border-radius: 12px;
+      padding: 16px; cursor: pointer; transition: all 0.15s; text-decoration: none; color: inherit;
+    }
+    .tool-card:hover { border-color: var(--c); background: #161616; transform: translateY(-1px); }
+    .tool-card-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .tool-card-desc { font-size: 12px; color: #555; line-height: 1.4; }
+    .tool-card-badge { font-size: 10px; padding: 2px 8px; border-radius: 10px; margin-top: 8px; display: inline-block; background: var(--bg); color: var(--c); }
+
+    /* STEPS */
+    .steps { margin-bottom: 28px; }
+    .step { display: flex; gap: 14px; margin-bottom: 4px; cursor: pointer; }
+    .step-left { display: flex; flex-direction: column; align-items: center; }
+    .step-circle {
+      width: 28px; height: 28px; border-radius: 50%; border: 2px solid #2a2a2a;
+      display: flex; align-items: center; justify-content: center; font-size: 12px;
+      font-weight: 700; color: #555; flex-shrink: 0; transition: all 0.2s; background: #111;
+    }
+    .step-circle.done { background: var(--bg); border-color: var(--c); color: var(--c); }
+    .step-line { width: 2px; flex: 1; background: #1e1e1e; min-height: 8px; margin: 3px 0; }
+    .step-content { flex: 1; padding-bottom: 16px; }
+    .step-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; color: #ddd; padding-top: 3px; }
+    .step-detail { font-size: 13px; color: #666; line-height: 1.5; }
+
+    /* MARK DONE BTN */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer;
+      font-size: 13px; font-weight: 600; transition: all 0.15s;
+    }
+    .btn-primary { background: var(--c); color: #000; }
+    .btn-primary:hover { opacity: 0.85; }
+    .btn-ghost { background: #1a1a1a; color: #888; border: 1px solid #2a2a2a; }
+    .btn-ghost:hover { background: #222; color: #ccc; }
+
+    /* CODE BLOCK */
+    .code-block {
+      background: #0d0d0d; border: 1px solid #1e1e1e; border-radius: 10px;
+      padding: 16px; font-family: monospace; font-size: 12px; color: #a78bfa;
+      line-height: 1.6; margin: 12px 0; position: relative; overflow-x: auto;
+    }
+    .copy-btn {
+      position: absolute; top: 10px; right: 10px; background: #1e1e1e;
+      border: none; color: #888; font-size: 11px; padding: 4px 10px;
+      border-radius: 6px; cursor: pointer;
+    }
+    .copy-btn:hover { color: #fff; background: #2a2a2a; }
+
+    /* AUTOMATION FLOW */
+    .flow-chain { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 28px; }
+    .flow-node {
+      background: #111; border: 1px solid #1e1e1e; border-radius: 8px;
+      padding: 8px 14px; font-size: 12px; font-weight: 600; color: #888;
+    }
+    .flow-node.highlight { border-color: var(--c); color: var(--c); background: var(--bg); }
+    .flow-arrow-sm { color: #333; font-size: 16px; }
+
+    /* PROGRESS BAR */
+    .progress-wrap { background: #1a1a1a; border-radius: 4px; height: 4px; margin-bottom: 28px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--c); border-radius: 4px; transition: width 0.3s; }
+
+    /* EMAIL PREVIEW */
+    .email-preview { background: #111; border: 1px solid #1e1e1e; border-radius: 12px; overflow: hidden; margin-bottom: 12px; }
+    .email-header { background: #161616; padding: 12px 16px; border-bottom: 1px solid #1e1e1e; display: flex; justify-content: space-between; align-items: center; }
+    .email-subject { font-size: 13px; font-weight: 600; }
+    .email-day { font-size: 11px; color: #555; }
+    .email-body { padding: 16px; font-size: 13px; color: #888; line-height: 1.7; white-space: pre-line; }
+
+    /* NAV BUTTONS */
+    .nav-btns { display: flex; gap: 10px; margin-top: 28px; padding-top: 20px; border-top: 1px solid #1a1a1a; }
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Airbnb Management Workflow</h1>
+  <p>Denver, CO — Lead Generation to Client Management</p>
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-val" style="color:#38bdf8" id="leads-count">0</div>
+      <div class="stat-label">Leads Found</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val" style="color:#fb923c" id="outreach-count">0</div>
+      <div class="stat-label">Contacted</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val" style="color:#4ade80" id="clients-count">0</div>
+      <div class="stat-label">Clients</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val" style="color:#facc15" id="revenue-count">$0</div>
+      <div class="stat-label">Monthly Revenue</div>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-label">Stages</div>
+
+    <button class="stage-btn active" onclick="show(0)" id="btn-0" style="--c:#38bdf8;--bg:#0e2d3d">
+      <div class="stage-icon">🔍</div>
+      <div class="stage-info">
+        <div class="stage-name">Market Research</div>
+        <div class="stage-sub">Find strong areas</div>
+      </div>
+      <div class="stage-status" id="st-0"></div>
+    </button>
+
+    <button class="stage-btn" onclick="show(1)" id="btn-1" style="--c:#4ade80;--bg:#0e220e">
+      <div class="stage-icon">🎯</div>
+      <div class="stage-info">
+        <div class="stage-name">Lead Generation</div>
+        <div class="stage-sub">Scrape underperformers</div>
+      </div>
+      <div class="stage-status" id="st-1"></div>
+    </button>
+
+    <button class="stage-btn" onclick="show(2)" id="btn-2" style="--c:#fb923c;--bg:#221200">
+      <div class="stage-icon">📧</div>
+      <div class="stage-info">
+        <div class="stage-name">Outreach</div>
+        <div class="stage-sub">Automated emails</div>
+      </div>
+      <div class="stage-status" id="st-2"></div>
+    </button>
+
+    <button class="stage-btn" onclick="show(3)" id="btn-3" style="--c:#c084fc;--bg:#1e0e1e">
+      <div class="stage-icon">🤝</div>
+      <div class="stage-info">
+        <div class="stage-name">Sales & Close</div>
+        <div class="stage-sub">Book calls, sign deals</div>
+      </div>
+      <div class="stage-status" id="st-3"></div>
+    </button>
+
+    <button class="stage-btn" onclick="show(4)" id="btn-4" style="--c:#facc15;--bg:#222200">
+      <div class="stage-icon">🚀</div>
+      <div class="stage-info">
+        <div class="stage-name">Onboarding</div>
+        <div class="stage-sub">Set up the property</div>
+      </div>
+      <div class="stage-status" id="st-4"></div>
+    </button>
+
+    <button class="stage-btn" onclick="show(5)" id="btn-5" style="--c:#f87171;--bg:#1c0a0a">
+      <div class="stage-icon">⚙️</div>
+      <div class="stage-info">
+        <div class="stage-name">Operations</div>
+        <div class="stage-sub">Day-to-day autopilot</div>
+      </div>
+      <div class="stage-status" id="st-5"></div>
+    </button>
+
+    <button class="stage-btn" onclick="show(6)" id="btn-6" style="--c:#67e8f9;--bg:#071218">
+      <div class="stage-icon">📊</div>
+      <div class="stage-info">
+        <div class="stage-name">Reporting</div>
+        <div class="stage-sub">Show hosts their ROI</div>
+      </div>
+      <div class="stage-status" id="st-6"></div>
+    </button>
+
+    <div style="margin-top:16px; padding: 0 16px;">
+      <div class="sidebar-label" style="margin-bottom:8px">Automation</div>
+      <button class="stage-btn" onclick="show(7)" id="btn-7" style="--c:#a855f7;--bg:#200a2a; margin: 0 -16px; width: calc(100% + 32px)">
+        <div class="stage-icon">⚡</div>
+        <div class="stage-info">
+          <div class="stage-name">Make.com Setup</div>
+          <div class="stage-sub">Connect everything</div>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN PANELS -->
+  <div class="main">
+
+    <!-- PANEL 0: Market Research -->
+    <div class="panel visible" id="panel-0" style="--c:#38bdf8;--bg:#0e2d3d">
+      <div class="panel-header">
+        <div class="panel-icon">🔍</div>
+        <div>
+          <div class="panel-title">Market Research</div>
+          <div class="panel-desc">Confirm Denver is a strong STR market before spending time on leads.</div>
+        </div>
+      </div>
+
+      <div class="section-label">Denver Market Snapshot</div>
+      <div class="tools-grid" style="margin-bottom:20px">
+        <div class="tool-card" style="--c:#38bdf8;--bg:#0e2d3d">
+          <div class="tool-card-name">Avg Occupancy</div>
+          <div style="font-size:28px;font-weight:700;color:#38bdf8;margin:8px 0">72%</div>
+          <div class="tool-card-desc">Denver STR market average</div>
+        </div>
+        <div class="tool-card" style="--c:#38bdf8;--bg:#0e2d3d">
+          <div class="tool-card-name">Avg Daily Rate</div>
+          <div style="font-size:28px;font-weight:700;color:#38bdf8;margin:8px 0">$185</div>
+          <div class="tool-card-desc">Per night, entire home</div>
+        </div>
+        <div class="tool-card" style="--c:#38bdf8;--bg:#0e2d3d">
+          <div class="tool-card-name">Avg Monthly Rev</div>
+          <div style="font-size:28px;font-weight:700;color:#38bdf8;margin:8px 0">$4,800</div>
+          <div class="tool-card-desc">Top quartile host</div>
+        </div>
+        <div class="tool-card" style="--c:#38bdf8;--bg:#0e2d3d">
+          <div class="tool-card-name">Active Listings</div>
+          <div style="font-size:28px;font-weight:700;color:#38bdf8;margin:8px 0">3,400+</div>
+          <div class="tool-card-desc">Denver metro area</div>
+        </div>
+      </div>
+
+      <div class="section-label">Research Tools</div>
+      <div class="tools-grid">
+        <a href="https://www.airdna.co" target="_blank" class="tool-card" style="--c:#38bdf8;--bg:#0e2d3d">
+          <div class="tool-card-name">AirDNA</div>
+          <div class="tool-card-desc">Full market analytics — occupancy, ADR, RevPAR by neighborhood</div>
+          <div class="tool-card-badge">$40/mo</div>
+        </a>
+        <a href="https://www.mashvisor.com" target="_blank" class="tool-card" style="--c:#38bdf8;--bg:#0e2d3d">
+          <div class="tool-card-name">Mashvisor</div>
+          <div class="tool-card-desc">Property-level ROI analysis and market comparisons</div>
+          <div class="tool-card-badge">$17/mo</div>
+        </a>
+        <a href="https://www.google.com/maps" target="_blank" class="tool-card" style="--c:#38bdf8;--bg:#0e2d3d">
+          <div class="tool-card-name">Google Maps</div>
+          <div class="tool-card-desc">Identify high-demand neighborhoods near attractions</div>
+          <div class="tool-card-badge">Free</div>
+        </a>
+      </div>
+
+      <div class="section-label" style="margin-top:24px">Setup Checklist</div>
+      <div class="steps" id="steps-0">
+        <div class="step" onclick="toggleStep(this,0)">
+          <div class="step-left"><div class="step-circle">1</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Sign up for AirDNA or Mashvisor</div>
+            <div class="step-detail">AirDNA gives you the most accurate Denver data. Use their free trial to validate the market first.</div>
+          </div>
+        </div>
+        <div class="step" onclick="toggleStep(this,0)">
+          <div class="step-left"><div class="step-circle">2</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Look up Denver market metrics</div>
+            <div class="step-detail">Note the avg occupancy rate, ADR, and monthly revenue. This becomes your benchmark for filtering underperformers.</div>
+          </div>
+        </div>
+        <div class="step" onclick="toggleStep(this,0)">
+          <div class="step-left"><div class="step-circle">3</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Define your "underperformer" threshold</div>
+            <div class="step-detail">Example: any listing earning less than $2,400/month (50% of market avg) is a target lead.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-primary" onclick="markDone(0)">Mark Complete ✓</button>
+        <button class="btn btn-ghost" onclick="show(1)">Next Stage →</button>
+      </div>
+    </div>
+
+    <!-- PANEL 1: Lead Generation -->
+    <div class="panel" id="panel-1" style="--c:#4ade80;--bg:#0e220e">
+      <div class="panel-header">
+        <div class="panel-icon">🎯</div>
+        <div>
+          <div class="panel-title">Lead Generation</div>
+          <div class="panel-desc">Scrape Denver Airbnb listings and filter hosts earning below market average.</div>
+        </div>
+      </div>
+
+      <div class="section-label">How It Works</div>
+      <div class="flow-chain" style="margin-bottom:24px">
+        <div class="flow-node highlight">Apify Scraper</div>
+        <div class="flow-arrow-sm">→</div>
+        <div class="flow-node highlight">Filter &lt;$120/night + &lt;20 reviews</div>
+        <div class="flow-arrow-sm">→</div>
+        <div class="flow-node highlight">Airtable Lead Record</div>
+        <div class="flow-arrow-sm">→</div>
+        <div class="flow-node highlight">Outreach Queue</div>
+      </div>
+
+      <div class="section-label">Apify Input Config</div>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+{
+  "locationQuery": "Denver, CO, USA",
+  "maxListings": 200,
+  "currency": "USD",
+  "propertyType": "entire_home"
+}
+      </div>
+
+      <div class="section-label">Tools</div>
+      <div class="tools-grid">
+        <a href="https://apify.com/store" target="_blank" class="tool-card" style="--c:#4ade80;--bg:#0e220e">
+          <div class="tool-card-name">Apify</div>
+          <div class="tool-card-desc">Run the Airbnb Scraper actor — pulls 200 Denver listings in ~5 min</div>
+          <div class="tool-card-badge">Free tier available</div>
+        </a>
+        <a href="https://airtable.com" target="_blank" class="tool-card" style="--c:#4ade80;--bg:#0e220e">
+          <div class="tool-card-name">Airtable</div>
+          <div class="tool-card-desc">Stores every lead with price, reviews, revenue gap, and status</div>
+          <div class="tool-card-badge">Free</div>
+        </a>
+        <a href="https://clay.com" target="_blank" class="tool-card" style="--c:#4ade80;--bg:#0e220e">
+          <div class="tool-card-name">Clay</div>
+          <div class="tool-card-desc">Enrich leads — find host emails and contact info automatically</div>
+          <div class="tool-card-badge">$149/mo</div>
+        </a>
+      </div>
+
+      <div class="section-label" style="margin-top:8px">Airtable Fields to Create</div>
+      <div class="code-block">
+Listing Title     → Single line text
+Listing URL       → URL
+Host Name         → Single line text
+Host Email        → Email
+Price Per Night   → Currency
+Review Count      → Number
+Rating            → Number
+Est. Monthly Rev  → Currency  (= Price × 18 nights)
+Revenue Gap       → Currency  (= $4,800 - Est. Monthly Rev)
+Status            → Single select (New / Contacted / Replied / Signed)
+Date Found        → Date
+      </div>
+
+      <div class="section-label">Setup Checklist</div>
+      <div class="steps" id="steps-1">
+        <div class="step" onclick="toggleStep(this,1)">
+          <div class="step-left"><div class="step-circle">1</div><div class="step-line"></div></div>
+          <div class="step-content"><div class="step-title">Create Apify account and find "Airbnb Scraper" by Voyager</div><div class="step-detail">apify.com → Actor Store → search "Airbnb Scraper"</div></div>
+        </div>
+        <div class="step" onclick="toggleStep(this,1)">
+          <div class="step-left"><div class="step-circle">2</div><div class="step-line"></div></div>
+          <div class="step-content"><div class="step-title">Paste the config above and run the scraper</div><div class="step-detail">Results will be ready in ~5 minutes. Export as JSON.</div></div>
+        </div>
+        <div class="step" onclick="toggleStep(this,1)">
+          <div class="step-left"><div class="step-circle">3</div><div class="step-line"></div></div>
+          <div class="step-content"><div class="step-title">Create Airtable base with fields listed above</div><div class="step-detail">Name the base "Airbnb Lead Pipeline" and the table "Leads"</div></div>
+        </div>
+        <div class="step" onclick="toggleStep(this,1)">
+          <div class="step-left"><div class="step-circle">4</div><div class="step-line"></div></div>
+          <div class="step-content"><div class="step-title">Copy your Airtable Base ID from the URL</div><div class="step-detail">Looks like appXXXXXXXXXXXXXX — you'll need this for Make.com</div></div>
+        </div>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-primary" onclick="markDone(1); updateStats('leads', 47)">Mark Complete ✓</button>
+        <button class="btn btn-ghost" onclick="show(2)">Next Stage →</button>
+      </div>
+    </div>
+
+    <!-- PANEL 2: Outreach -->
+    <div class="panel" id="panel-2" style="--c:#fb923c;--bg:#221200">
+      <div class="panel-header">
+        <div class="panel-icon">📧</div>
+        <div>
+          <div class="panel-title">Outreach</div>
+          <div class="panel-desc">Automated 3-step email sequence sent to every lead. Personalized with their revenue gap data.</div>
+        </div>
+      </div>
+
+      <div class="section-label">Email Sequence</div>
+
+      <div class="email-preview">
+        <div class="email-header">
+          <div class="email-subject">Your Denver listing could earn more</div>
+          <div class="email-day">Day 0</div>
+        </div>
+        <div class="email-body">Hey [Host Name],
+
+I came across your listing on Airbnb. I run a short-term rental management company in Denver and noticed your property is priced at $[price]/night.
+
+Based on what similar properties in your area are earning, there's likely a gap of around $[revenue_gap]/month you're leaving on the table.
+
+I help Denver hosts close that gap by handling everything — pricing, guest communication, cleaning coordination, and listing optimization — for a flat 20% of revenue.
+
+Would it be worth a 15-minute call to show you what your property could realistically earn?
+
+Best,
+[Your Name]</div>
+      </div>
+
+      <div class="email-preview">
+        <div class="email-header">
+          <div class="email-subject">Re: Your Denver listing</div>
+          <div class="email-day">Day 3</div>
+        </div>
+        <div class="email-body">Hey [Host Name],
+
+Just following up on my last email.
+
+Hosts who struggle most are usually underpriced or not getting enough visibility — both are fixable.
+
+I can put together a free revenue analysis for your property. No strings attached. Just reply and I'll send it over.
+
+[Your Name]</div>
+      </div>
+
+      <div class="email-preview">
+        <div class="email-header">
+          <div class="email-subject">Last note — free Denver market report</div>
+          <div class="email-day">Day 7</div>
+        </div>
+        <div class="email-body">Hey [Host Name],
+
+Last message — I promise.
+
+I put together a quick Denver STR market report showing what hosts in your neighborhood are averaging per month. Happy to send it your way if useful.
+
+If now isn't the right time, totally understand.
+
+[Your Name]</div>
+      </div>
+
+      <div class="section-label" style="margin-top:20px">Tools</div>
+      <div class="tools-grid">
+        <a href="https://instantly.ai" target="_blank" class="tool-card" style="--c:#fb923c;--bg:#221200">
+          <div class="tool-card-name">Instantly.ai</div>
+          <div class="tool-card-desc">Sends the 3-step sequence automatically. Tracks opens, replies, and bounces.</div>
+          <div class="tool-card-badge">$37/mo</div>
+        </a>
+        <a href="https://www.openphone.com" target="_blank" class="tool-card" style="--c:#fb923c;--bg:#221200">
+          <div class="tool-card-name">OpenPhone</div>
+          <div class="tool-card-desc">Follow up by text or call for hot leads who opened but didn't reply</div>
+          <div class="tool-card-badge">$15/mo</div>
+        </a>
+      </div>
+
+      <div class="section-label" style="margin-top:8px">Setup Checklist</div>
+      <div class="steps" id="steps-2">
+        <div class="step" onclick="toggleStep(this,2)">
+          <div class="step-left"><div class="step-circle">1</div><div class="step-line"></div></div>
+          <div class="step-content"><div class="step-title">Create Instantly.ai account and connect your email</div><div class="step-detail">Use a dedicated outreach email (not your main one) to protect deliverability</div></div>
+        </div>
+        <div class="step" onclick="toggleStep(this,2)">
+          <div class="step-left"><div class="step-circle">2</div><div class="step-line"></div></div>
+          <div class="step-content"><div class="step-title">Create a campaign called "Denver Airbnb Hosts"</div><div class="step-detail">Add the 3 email steps above. Set daily limit to 30 emails/day.</div></div>
+        </div>
+        <div class="step" onclick="toggleStep(this,2)">
+          <div class="step-left"><div class="step-circle">3</div><div class="step-line"></div></div>
+          <div class="step-content"><div class="step-title">Copy your API key and Campaign ID</div><div class="step-detail">Settings → API in Instantly. You'll paste these into Make.com.</div></div>
+        </div>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-primary" onclick="markDone(2); updateStats('outreach', 47)">Mark Complete ✓</button>
+        <button class="btn btn-ghost" onclick="show(3)">Next Stage →</button>
+      </div>
+    </div>
+
+    <!-- PANEL 3: Sales -->
+    <div class="panel" id="panel-3" style="--c:#c084fc;--bg:#1e0e1e">
+      <div class="panel-header">
+        <div class="panel-icon">🤝</div>
+        <div>
+          <div class="panel-title">Sales & Close</div>
+          <div class="panel-desc">Turn interested replies into signed management agreements.</div>
+        </div>
+      </div>
+
+      <div class="section-label">The Sales Flow</div>
+      <div class="flow-chain">
+        <div class="flow-node highlight">Reply received</div>
+        <div class="flow-arrow-sm">→</div>
+        <div class="flow-node highlight">Send Calendly link</div>
+        <div class="flow-arrow-sm">→</div>
+        <div class="flow-node highlight">Discovery call</div>
+        <div class="flow-arrow-sm">→</div>
+        <div class="flow-node highlight">Send proposal</div>
+        <div class="flow-arrow-sm">→</div>
+        <div class="flow-node highlight">Contract signed</div>
+      </div>
+
+      <div class="section-label" style="margin-top:20px">Tools</div>
+      <div class="tools-grid">
+        <a href="https://hubspot.com" target="_blank" class="tool-card" style="--c:#c084fc;--bg:#1e0e1e">
+          <div class="tool-card-name">HubSpot CRM</div>
+          <div class="tool-card-desc">Track every deal — call booked, proposal sent, signed. Free forever.</div>
+          <div class="tool-card-badge">Free</div>
+        </a>
+        <a href="https://calendly.com" target="_blank" class="tool-card" style="--c:#c084fc;--bg:#1e0e1e">
+          <div class="tool-card-name">Calendly</div>
+          <div class="tool-card-desc">Let hosts book a 15-min call without back and forth</div>
+          <div class="tool-card-badge">Free</div>
+        </a>
+        <a href="https://pandadoc.com" target="_blank" class="tool-card" style="--c:#c084fc;--bg:#1e0e1e">
+          <div class="tool-card-name">PandaDoc</div>
+          <div class="tool-card-desc">Send and e-sign the management agreement. Tracks when they open it.</div>
+          <div class="tool-card-badge">$35/mo</div>
+        </a>
+        <a href="https://stripe.com" target="_blank" class="tool-card" style="--c:#c084fc;--bg:#1e0e1e">
+          <div class="tool-card-name">Stripe</div>
+          <div class="tool-card-desc">Collect onboarding fee and set up recurring monthly payments</div>
+          <div class="tool-card-badge">2.9% + 30¢</div>
+        </a>
+      </div>
+
+      <div class="section-label" style="margin-top:8px">Your Pitch — Key Points</div>
+      <div class="code-block">
+"Your listing is earning ~$[X]/month.
+ Similar properties nearby earn $4,800/month.
+ That's a $[gap] gap — every month.
+
+ I'll close that gap by handling:
+ → Dynamic pricing (PriceLabs)
+ → Guest communication (auto-responded)
+ → Cleaning scheduling (Turno)
+ → Listing optimization
+
+ My fee: 20% of revenue.
+ You earn more. I handle everything."
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-primary" onclick="markDone(3); updateStats('clients', 1); updateStats('revenue', 960)">Mark Complete ✓</button>
+        <button class="btn btn-ghost" onclick="show(4)">Next Stage →</button>
+      </div>
+    </div>
+
+    <!-- PANEL 4: Onboarding -->
+    <div class="panel" id="panel-4" style="--c:#facc15;--bg:#222200">
+      <div class="panel-header">
+        <div class="panel-icon">🚀</div>
+        <div>
+          <div class="panel-title">Onboarding</div>
+          <div class="panel-desc">Once signed, set the property up for maximum performance in the first 2 weeks.</div>
+        </div>
+      </div>
+
+      <div class="section-label">Onboarding Checklist</div>
+      <div class="steps" id="steps-4">
+        <div class="step" onclick="toggleStep(this,4)">
+          <div class="step-left"><div class="step-circle">1</div><div class="step-line"></div></div>
+          <div class="step-content"><div class="step-title">Get co-host access to the Airbnb listing</div><div class="step-detail">Host goes to their listing → Co-hosts → Invite you by email. You'll get full management access.</div></div>
+        </div>
+        <div class="step" onclick="toggleStep(this,4)">
+          <div class="step-left"><div class="step-circle">2</div><div class="step-line"></div></div>
+          <div class="step-content"><div class="step-title">Rewrite the listing title and description</div><div class="step-detail">Use ChatGPT to write a high-converting description. Highlight neighborhood, amenities, and unique features.</div></div>
+        </div>
+        <div class="step" onclick="toggleStep(this,4)">
+          <div class="step-left"><div class="step-circle">3</div><div class="step-line"></div></div>
+          <div class="step-content"><div class="step-title">Upgrade photos if needed</div><div class="step-detail">Bad photos are the #1 reason listings underperform. Hire a local photographer if the current ones are poor.</div></div>
+        </div>
+        <div class="step" onclick="toggleStep(this,4)">
+          <div class="step-left"><div class="step-circle">4</div><div class="step-line"></div></div>
+          <div class="step-content"><div class="step-title">Connect PriceLabs for dynamic pricing</div><div class="step-detail">pricelabs.co → Connect Airbnb → Set your base price and let it optimize automatically by demand.</div></div>
+        </div>
+        <div class="step" onclick="toggleStep(this,4)">
+          <div class="step-left"><div class="step-circle">5</div><div class="step-line"></div></div>
+          <div class="step-content"><div class="step-title">Set up Turno for automated cleaning</div><div class="step-detail">turno.com → Connect Airbnb → Add your cleaner. They get auto-notified after every checkout.</div></div>
+        </div>
+        <div class="step" onclick="toggleStep(this,4)">
+          <div class="step-left"><div class="step-circle">6</div><div class="step-line"></div></div>
+          <div class="step-content"><div class="step-title">Connect Hospitable for guest messaging</div><div class="step-detail">hospitable.com → Connect Airbnb → Enable auto-replies for check-in info, house rules, and checkout reminders.</div></div>
+        </div>
+      </div>
+
+      <div class="section-label" style="margin-top:4px">Tools</div>
+      <div class="tools-grid">
+        <a href="https://pricelabs.co" target="_blank" class="tool-card" style="--c:#facc15;--bg:#222200">
+          <div class="tool-card-name">PriceLabs</div>
+          <div class="tool-card-desc">Dynamic pricing — adjusts nightly rates based on demand, events, and competitors</div>
+          <div class="tool-card-badge">$19.99/listing</div>
+        </a>
+        <a href="https://turno.com" target="_blank" class="tool-card" style="--c:#facc15;--bg:#222200">
+          <div class="tool-card-name">Turno</div>
+          <div class="tool-card-desc">Auto-schedules cleaners after every Airbnb checkout</div>
+          <div class="tool-card-badge">Free + cleaner fee</div>
+        </a>
+        <a href="https://hospitable.com" target="_blank" class="tool-card" style="--c:#facc15;--bg:#222200">
+          <div class="tool-card-name">Hospitable</div>
+          <div class="tool-card-desc">Automated guest messaging — check-in, rules, checkout, reviews</div>
+          <div class="tool-card-badge">$40/mo</div>
+        </a>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-primary" onclick="markDone(4)">Mark Complete ✓</button>
+        <button class="btn btn-ghost" onclick="show(5)">Next Stage →</button>
+      </div>
+    </div>
+
+    <!-- PANEL 5: Operations -->
+    <div class="panel" id="panel-5" style="--c:#f87171;--bg:#1c0a0a">
+      <div class="panel-header">
+        <div class="panel-icon">⚙️</div>
+        <div>
+          <div class="panel-title">Operations</div>
+          <div class="panel-desc">Once onboarded, daily management runs on autopilot. You only step in for exceptions.</div>
+        </div>
+      </div>
+
+      <div class="section-label">What Runs Automatically</div>
+      <div class="tools-grid">
+        <div class="tool-card" style="--c:#f87171;--bg:#1c0a0a; cursor:default">
+          <div class="tool-card-name">Guest Messaging</div>
+          <div class="tool-card-desc">Check-in instructions, house rules, and checkout reminders sent automatically via Hospitable</div>
+          <div class="tool-card-badge">Auto</div>
+        </div>
+        <div class="tool-card" style="--c:#f87171;--bg:#1c0a0a; cursor:default">
+          <div class="tool-card-name">Cleaning Schedule</div>
+          <div class="tool-card-desc">Turno notifies your cleaner after every checkout. You get a photo report when done.</div>
+          <div class="tool-card-badge">Auto</div>
+        </div>
+        <div class="tool-card" style="--c:#f87171;--bg:#1c0a0a; cursor:default">
+          <div class="tool-card-name">Pricing Updates</div>
+          <div class="tool-card-desc">PriceLabs adjusts the nightly rate daily based on Denver demand and local events</div>
+          <div class="tool-card-badge">Auto</div>
+        </div>
+        <div class="tool-card" style="--c:#f87171;--bg:#1c0a0a; cursor:default">
+          <div class="tool-card-name">Review Requests</div>
+          <div class="tool-card-desc">Hospitable sends a review reminder to guests 1 hour after checkout</div>
+          <div class="tool-card-badge">Auto</div>
+        </div>
+      </div>
+
+      <div class="section-label" style="margin-top:8px">What You Handle Manually</div>
+      <div class="code-block">
+→ Guest issues mid-stay (noise complaints, lockouts, etc.)
+→ Maintenance requests from guests
+→ Responding to negative reviews
+→ Restocking supplies (coordinate with cleaner)
+→ Host relationship check-ins (monthly call)
+      </div>
+
+      <div class="section-label" style="margin-top:16px">Tools</div>
+      <div class="tools-grid">
+        <a href="https://hospitable.com" target="_blank" class="tool-card" style="--c:#f87171;--bg:#1c0a0a">
+          <div class="tool-card-name">Hospitable</div>
+          <div class="tool-card-desc">Automated messaging, review management, multi-platform inbox</div>
+          <div class="tool-card-badge">$40/mo</div>
+        </a>
+        <a href="https://turno.com" target="_blank" class="tool-card" style="--c:#f87171;--bg:#1c0a0a">
+          <div class="tool-card-name">Turno</div>
+          <div class="tool-card-desc">Cleaner scheduling, photo reports, supply tracking</div>
+          <div class="tool-card-badge">Free</div>
+        </a>
+        <a href="https://slack.com" target="_blank" class="tool-card" style="--c:#f87171;--bg:#1c0a0a">
+          <div class="tool-card-name">Slack</div>
+          <div class="tool-card-desc">Team communication — alerts for issues, cleaner updates, guest problems</div>
+          <div class="tool-card-badge">Free</div>
+        </a>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-primary" onclick="markDone(5)">Mark Complete ✓</button>
+        <button class="btn btn-ghost" onclick="show(6)">Next Stage →</button>
+      </div>
+    </div>
+
+    <!-- PANEL 6: Reporting -->
+    <div class="panel" id="panel-6" style="--c:#67e8f9;--bg:#071218">
+      <div class="panel-header">
+        <div class="panel-icon">📊</div>
+        <div>
+          <div class="panel-title">Reporting</div>
+          <div class="panel-desc">Send hosts a monthly report showing their earnings, occupancy, and how you improved their performance.</div>
+        </div>
+      </div>
+
+      <div class="section-label">Monthly Report — What to Include</div>
+      <div class="code-block">
+Month: April 2026
+Property: [Listing Title]
+
+Revenue This Month:     $4,200
+vs. Last Month:         +$680 (+19%)
+vs. Before Management:  +$1,800 (+75%)
+
+Occupancy Rate:         78%
+Avg Nightly Rate:       $172
+Total Nights Booked:    24 / 30
+
+Your Cut (80%):         $3,360
+Management Fee (20%):   $840
+
+New Reviews This Month: 4 (avg 4.9★)
+      </div>
+
+      <div class="section-label" style="margin-top:16px">Tools</div>
+      <div class="tools-grid">
+        <a href="https://pricelabs.co" target="_blank" class="tool-card" style="--c:#67e8f9;--bg:#071218">
+          <div class="tool-card-name">PriceLabs</div>
+          <div class="tool-card-desc">Built-in revenue dashboard — pull monthly stats for each property</div>
+          <div class="tool-card-badge">Included</div>
+        </a>
+        <a href="https://sheets.google.com" target="_blank" class="tool-card" style="--c:#67e8f9;--bg:#071218">
+          <div class="tool-card-name">Google Sheets</div>
+          <div class="tool-card-desc">Build a simple monthly report template. Copy and fill each month.</div>
+          <div class="tool-card-badge">Free</div>
+        </a>
+        <a href="https://lookerstudio.google.com" target="_blank" class="tool-card" style="--c:#67e8f9;--bg:#071218">
+          <div class="tool-card-name">Looker Studio</div>
+          <div class="tool-card-desc">Connect Sheets to build a live dashboard you can share with the host</div>
+          <div class="tool-card-badge">Free</div>
+        </a>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-primary" onclick="markDone(6)">Mark Complete ✓</button>
+        <button class="btn btn-ghost" onclick="show(7)">View Automation →</button>
+      </div>
+    </div>
+
+    <!-- PANEL 7: Make.com -->
+    <div class="panel" id="panel-7" style="--c:#a855f7;--bg:#200a2a">
+      <div class="panel-header">
+        <div class="panel-icon">⚡</div>
+        <div>
+          <div class="panel-title">Make.com Automation</div>
+          <div class="panel-desc">This single Make.com scenario runs every Monday and connects all your tools automatically.</div>
+        </div>
+      </div>
+
+      <div class="section-label">Full Automation Flow</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
+        <div class="flow-chain">
+          <div class="flow-node highlight" style="--c:#a855f7;--bg:#200a2a">⏰ Schedule (Monday 9am)</div>
+          <div class="flow-arrow-sm">→</div>
+          <div class="flow-node highlight" style="--c:#a855f7;--bg:#200a2a">Apify: Run Scraper</div>
+          <div class="flow-arrow-sm">→</div>
+          <div class="flow-node highlight" style="--c:#a855f7;--bg:#200a2a">Wait 5 min</div>
+          <div class="flow-arrow-sm">→</div>
+          <div class="flow-node highlight" style="--c:#a855f7;--bg:#200a2a">Apify: Get Results</div>
+        </div>
+        <div style="padding-left:16px;color:#555;font-size:12px">↓ for each listing</div>
+        <div class="flow-chain">
+          <div class="flow-node highlight" style="--c:#a855f7;--bg:#200a2a">Filter: price &lt; $120 AND reviews &lt; 20</div>
+          <div class="flow-arrow-sm">→</div>
+          <div class="flow-node highlight" style="--c:#a855f7;--bg:#200a2a">Airtable: Create Lead</div>
+          <div class="flow-arrow-sm">→</div>
+          <div class="flow-node highlight" style="--c:#a855f7;--bg:#200a2a">Instantly: Add to Campaign</div>
+        </div>
+      </div>
+
+      <div class="section-label">Import the Blueprint</div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-left"><div class="step-circle" style="--c:#a855f7">1</div><div class="step-line"></div></div>
+          <div class="step-content"><div class="step-title">Go to make.com → Create new scenario</div><div class="step-detail">Click the 3 dots (···) in the top right → Import Blueprint</div></div>
+        </div>
+        <div class="step">
+          <div class="step-left"><div class="step-circle" style="--c:#a855f7">2</div><div class="step-line"></div></div>
+          <div class="step-content"><div class="step-title">Upload make-blueprint.json from your workflow folder</div><div class="step-detail">File is at: C:\Users\adanh\airbnb-workflow\make-blueprint.json</div></div>
+        </div>
+        <div class="step">
+          <div class="step-left"><div class="step-circle" style="--c:#a855f7">3</div><div class="step-line"></div></div>
+          <div class="step-content"><div class="step-title">Replace all placeholders with your API keys</div>
+          <div class="code-block" style="margin-top:8px">
+YOUR_APIFY_API_KEY     → from apify.com/account/integrations
+YOUR_AIRTABLE_BASE_ID  → from your Airtable URL (appXXXXX...)
+YOUR_INSTANTLY_API_KEY → from instantly.ai/settings/api
+YOUR_CAMPAIGN_ID       → from your Instantly campaign URL
+          </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-left"><div class="step-circle" style="--c:#a855f7">4</div><div class="step-line"></div></div>
+          <div class="step-content"><div class="step-title">Click "Run once" to test</div><div class="step-detail">Check Airtable — Denver leads should appear within 10 minutes</div></div>
+        </div>
+        <div class="step">
+          <div class="step-left"><div class="step-circle" style="--c:#a855f7">5</div></div>
+          <div class="step-content"><div class="step-title">Schedule it to run every Monday at 9am</div><div class="step-detail">Click the clock icon in Make.com and set a weekly schedule</div></div>
+        </div>
+      </div>
+
+      <div style="background:#200a2a;border:1px solid #a855f730;border-radius:12px;padding:20px;margin-top:8px;text-align:center">
+        <div style="color:#a855f7;font-weight:700;margin-bottom:6px">After setup is complete</div>
+        <div style="color:#666;font-size:13px;line-height:1.6">Every Monday: 200 Denver listings scraped → underperformers filtered → added to Airtable → emails sent automatically. You wake up to replies from interested hosts.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const panels = document.querySelectorAll('.panel');
+  const btns = document.querySelectorAll('.stage-btn');
+  const done = new Set();
+
+  function show(i) {
+    panels.forEach(p => p.classList.remove('visible'));
+    btns.forEach(b => b.classList.remove('active'));
+    document.getElementById('panel-' + i).classList.add('visible');
+    document.getElementById('btn-' + i).classList.add('active');
+  }
+
+  function toggleStep(el, panelIdx) {
+    const circle = el.querySelector('.step-circle');
+    circle.classList.toggle('done');
+  }
+
+  function markDone(i) {
+    done.add(i);
+    const st = document.getElementById('st-' + i);
+    if (st) { st.className = 'stage-status done'; }
+    const steps = document.querySelectorAll('#steps-' + i + ' .step-circle');
+    steps.forEach(s => s.classList.add('done'));
+  }
+
+  function copyCode(btn) {
+    const code = btn.parentElement.innerText.replace('Copy', '').trim();
+    navigator.clipboard.writeText(code).then(() => {
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 2000);
+    });
+  }
+
+  function updateStats(type, val) {
+    if (type === 'leads') document.getElementById('leads-count').textContent = val;
+    if (type === 'outreach') document.getElementById('outreach-count').textContent = val;
+    if (type === 'clients') document.getElementById('clients-count').textContent = val;
+    if (type === 'revenue') document.getElementById('revenue-count').textContent = '$' + val;
+  }
+</script>
+</body>
+</html>
