@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vela — Learning Roadmap</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #0a0a0a; color: #f0f0f0; min-height: 100vh; }
+
+    /* HEADER */
+    .header { padding: 20px; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .logo { font-size: 18px; font-weight: 800; color: #fff; }
+    .logo span { color: #ff5a5f; }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    .progress-wrap { background: #1a1a1a; border-radius: 20px; height: 8px; width: 160px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, #ff5a5f, #fb923c); border-radius: 20px; transition: width 0.4s; }
+    .progress-label { font-size: 12px; color: #555; white-space: nowrap; }
+    .nav-link { background: #141414; border: 1px solid #2a2a2a; color: #888; text-decoration: none; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; }
+    .nav-link:hover { color: #fff; border-color: #444; }
+
+    /* WEEK TABS */
+    .week-tabs { display: flex; gap: 0; border-bottom: 1px solid #1a1a1a; overflow-x: auto; padding: 0 20px; }
+    .week-tabs::-webkit-scrollbar { display: none; }
+    .week-tab { padding: 12px 20px; font-size: 13px; font-weight: 600; color: #555; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; background: none; border-top: none; border-left: none; border-right: none; transition: all 0.15s; }
+    .week-tab.active { color: #fff; border-bottom-color: #ff5a5f; }
+    .week-tab:hover { color: #ccc; }
+
+    /* LAYOUT */
+    .layout { display: flex; max-width: 1100px; margin: 0 auto; padding: 24px 20px; gap: 24px; }
+
+    /* DAY LIST */
+    .day-list { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+
+    /* DAY CARD */
+    .day-card { background: #111; border: 1px solid #1e1e1e; border-radius: 14px; overflow: hidden; transition: border-color 0.2s; }
+    .day-card.done { border-color: #4ade8020; }
+    .day-card.active-card { border-color: #ff5a5f40; }
+    .day-header { display: flex; align-items: center; gap: 14px; padding: 16px 18px; cursor: pointer; }
+    .day-header:hover { background: #141414; }
+    .day-num { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; flex-shrink: 0; }
+    .day-info { flex: 1; min-width: 0; }
+    .day-title { font-size: 14px; font-weight: 700; color: #ddd; }
+    .day-sub { font-size: 11px; color: #555; margin-top: 2px; }
+    .day-meta { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .day-time { font-size: 11px; color: #444; }
+    .check-btn { width: 26px; height: 26px; border-radius: 50%; border: 2px solid #2a2a2a; background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; transition: all 0.2s; color: transparent; }
+    .check-btn.done { background: #4ade80; border-color: #4ade80; color: #000; }
+    .chevron { color: #333; font-size: 14px; transition: transform 0.2s; }
+    .day-card.open .chevron { transform: rotate(180deg); }
+
+    /* DAY BODY */
+    .day-body { display: none; padding: 0 18px 18px; border-top: 1px solid #161616; }
+    .day-card.open .day-body { display: block; }
+
+    .task-list { margin: 14px 0; }
+    .task { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; cursor: pointer; }
+    .task-check { width: 18px; height: 18px; border-radius: 4px; border: 2px solid #2a2a2a; flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: transparent; transition: all 0.15s; }
+    .task-check.done { background: #4ade80; border-color: #4ade80; color: #000; }
+    .task-text { font-size: 13px; color: #aaa; line-height: 1.5; }
+    .task-text.done { color: #444; text-decoration: line-through; }
+
+    /* RESOURCES */
+    .resources { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+    .resource-link { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; background: #161616; border: 1px solid #222; font-size: 12px; color: #888; text-decoration: none; transition: all 0.15s; }
+    .resource-link:hover { color: #fff; border-color: #444; background: #1e1e1e; }
+    .resource-type { font-size: 10px; padding: 1px 6px; border-radius: 4px; }
+    .type-yt { background: #ff000020; color: #f87171; }
+    .type-read { background: #3b82f620; color: #60a5fa; }
+    .type-pod { background: #8b5cf620; color: #a78bfa; }
+    .type-tool { background: #10b98120; color: #34d399; }
+
+    /* NOTES */
+    .notes-section { margin-top: 14px; }
+    .notes-label { font-size: 10px; color: #444; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+    .notes-area { width: 100%; background: #0d0d0d; border: 1px solid #1e1e1e; border-radius: 10px; padding: 12px; color: #ccc; font-size: 13px; font-family: 'Segoe UI', sans-serif; resize: vertical; min-height: 80px; line-height: 1.6; transition: border-color 0.15s; }
+    .notes-area:focus { outline: none; border-color: #ff5a5f40; }
+    .notes-area::placeholder { color: #333; }
+    .save-indicator { font-size: 11px; color: #333; margin-top: 4px; transition: color 0.3s; }
+    .save-indicator.saved { color: #4ade80; }
+
+    /* KEY INSIGHT */
+    .insight { background: #0d1a0d; border: 1px solid #4ade8020; border-radius: 10px; padding: 12px 14px; margin: 14px 0; }
+    .insight-label { font-size: 10px; color: #4ade80; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+    .insight-text { font-size: 13px; color: #888; line-height: 1.5; }
+
+    /* SIDEBAR */
+    .sidebar { width: 260px; flex-shrink: 0; }
+    .sidebar-card { background: #111; border: 1px solid #1e1e1e; border-radius: 14px; padding: 18px; margin-bottom: 14px; }
+    .sidebar-title { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 12px; }
+    .sidebar-stat { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .sidebar-stat-label { font-size: 12px; color: #555; }
+    .sidebar-stat-val { font-size: 14px; font-weight: 700; color: #ff5a5f; }
+
+    /* WEEK PANELS */
+    .week-panel { display: none; }
+    .week-panel.active { display: block; }
+
+    /* WEEK LABEL */
+    .week-label { font-size: 11px; color: #444; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+    .week-label::after { content: ''; flex: 1; height: 1px; background: #1a1a1a; }
+
+    /* ALL NOTES */
+    .all-notes { display: flex; flex-direction: column; gap: 10px; }
+    .note-item { background: #0d0d0d; border: 1px solid #1e1e1e; border-radius: 10px; padding: 12px 14px; }
+    .note-day { font-size: 11px; color: #555; margin-bottom: 4px; }
+    .note-content { font-size: 13px; color: #aaa; line-height: 1.5; white-space: pre-wrap; }
+    .no-notes { color: #333; font-size: 13px; text-align: center; padding: 20px; }
+
+    /* MOBILE */
+    @media (max-width: 768px) {
+      .layout { flex-direction: column; padding: 16px; }
+      .sidebar { width: 100%; }
+      .week-tab { padding: 10px 14px; font-size: 12px; }
+      .progress-wrap { width: 100px; }
+    }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo"><span>Vela</span> — Learning Roadmap</div>
+  <div class="header-right">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="progress-wrap"><div class="progress-fill" id="progress-bar" style="width:0%"></div></div>
+      <div class="progress-label"><span id="done-count">0</span>/21 days</div>
+    </div>
+    <a href="index.html" class="nav-link">← Workflow</a>
+  </div>
+</div>
+
+<div class="week-tabs">
+  <button class="week-tab active" onclick="showWeek(0)">Week 1 — Foundations</button>
+  <button class="week-tab" onclick="showWeek(1)">Week 2 — Business Skills</button>
+  <button class="week-tab" onclick="showWeek(2)">Week 3 — Go Live</button>
+  <button class="week-tab" onclick="showWeek(3)">My Notes</button>
+</div>
+
+<div class="layout">
+  <div class="day-list">
+
+    <!-- WEEK 1 -->
+    <div class="week-panel active" id="week-0">
+      <div class="week-label">Week 1 — Understand how Airbnb and STR management works</div>
+
+      <!-- Day 1 -->
+      <div class="day-card" id="card-1" style="--c:#38bdf8">
+        <div class="day-header" onclick="toggle(1)">
+          <div class="day-num" style="background:#0e2d3d;color:#38bdf8">D1</div>
+          <div class="day-info">
+            <div class="day-title">How Airbnb Works as a Platform</div>
+            <div class="day-sub">Listings, search ranking, host vs guest experience</div>
+          </div>
+          <div class="day-meta">
+            <div class="day-time">~1.5 hrs</div>
+            <button class="check-btn" id="check-1" onclick="event.stopPropagation();markDay(1)">✓</button>
+            <div class="chevron">▾</div>
+          </div>
+        </div>
+        <div class="day-body">
+          <div class="task-list">
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Watch "How Airbnb Works" overview video (search YouTube)</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Browse 10 Airbnb listings in a city you know — notice titles, photos, pricing, reviews</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Read Airbnb's guest booking flow from their help center</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Write down: what makes you want to book one listing over another?</div></div>
+          </div>
+          <div class="resources">
+            <a href="https://www.youtube.com/@Robuilt" target="_blank" class="resource-link"><span class="resource-type type-yt">YT</span>Robuilt — STR basics</a>
+            <a href="https://www.airbnb.com/help" target="_blank" class="resource-link"><span class="resource-type type-read">Read</span>Airbnb Help Center</a>
+          </div>
+          <div class="insight"><div class="insight-label">Key Insight</div><div class="insight-text">Airbnb ranks listings by conversion rate, response time, and reviews. Understanding this tells you exactly what to fix for underperforming hosts.</div></div>
+          <div class="notes-section">
+            <div class="notes-label">My Notes — Day 1</div>
+            <textarea class="notes-area" id="note-1" placeholder="Write what you learned today, questions you have, anything that surprised you..." oninput="saveNote(1)"></textarea>
+            <div class="save-indicator" id="saved-1">Auto-saved</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Day 2 -->
+      <div class="day-card" id="card-2" style="--c:#4ade80">
+        <div class="day-header" onclick="toggle(2)">
+          <div class="day-num" style="background:#0e220e;color:#4ade80">D2</div>
+          <div class="day-info">
+            <div class="day-title">The Co-Hosting & Management Model</div>
+            <div class="day-sub">How STR management businesses actually work</div>
+          </div>
+          <div class="day-meta">
+            <div class="day-time">~2 hrs</div>
+            <button class="check-btn" id="check-2" onclick="event.stopPropagation();markDay(2)">✓</button>
+            <div class="chevron">▾</div>
+          </div>
+        </div>
+        <div class="day-body">
+          <div class="task-list">
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Watch 2 YouTube videos on "Airbnb co-hosting business" from Robuilt or Sean Rakidzich</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Understand the difference: co-host vs property manager vs rental arbitrage</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Research typical management fees (10–30% range) and what's included</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Write down: what would you offer at 20% and what wouldn't you include?</div></div>
+          </div>
+          <div class="resources">
+            <a href="https://www.youtube.com/@SeanRakidzich" target="_blank" class="resource-link"><span class="resource-type type-yt">YT</span>Sean Rakidzich</a>
+            <a href="https://www.biggerpockets.com/blog/short-term-rental" target="_blank" class="resource-link"><span class="resource-type type-read">Read</span>BiggerPockets STR</a>
+          </div>
+          <div class="insight"><div class="insight-label">Key Insight</div><div class="insight-text">Co-hosting is the lowest risk model — you never sign a lease or buy property. You earn recurring income from other people's assets.</div></div>
+          <div class="notes-section">
+            <div class="notes-label">My Notes — Day 2</div>
+            <textarea class="notes-area" id="note-2" placeholder="What's the difference between the models? What questions came up?" oninput="saveNote(2)"></textarea>
+            <div class="save-indicator" id="saved-2">Auto-saved</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Day 3 -->
+      <div class="day-card" id="card-3" style="--c:#fb923c">
+        <div class="day-header" onclick="toggle(3)">
+          <div class="day-num" style="background:#221200;color:#fb923c">D3</div>
+          <div class="day-info">
+            <div class="day-title">What Makes a Listing Perform Well</div>
+            <div class="day-sub">Photos, title, description, amenities, response rate</div>
+          </div>
+          <div class="day-meta">
+            <div class="day-time">~2 hrs</div>
+            <button class="check-btn" id="check-3" onclick="event.stopPropagation();markDay(3)">✓</button>
+            <div class="chevron">▾</div>
+          </div>
+        </div>
+        <div class="day-body">
+          <div class="task-list">
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Search "Airbnb listing optimization" on YouTube — watch 2 videos</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Find a top-rated listing in Denver and a low-rated one. Compare: photos, title, description, price, reviews</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">List 5 specific things the top listing does better</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Read about Airbnb Superhost status — what's required and why it matters</div></div>
+          </div>
+          <div class="resources">
+            <a href="https://www.youtube.com/results?search_query=airbnb+listing+optimization" target="_blank" class="resource-link"><span class="resource-type type-yt">YT</span>Listing optimization</a>
+            <a href="https://www.airbnb.com/help/article/175" target="_blank" class="resource-link"><span class="resource-type type-read">Read</span>Superhost requirements</a>
+          </div>
+          <div class="insight"><div class="insight-label">Key Insight</div><div class="insight-text">Photos are the #1 factor. A listing with professional photos earns 40% more on average. This is the easiest win you can deliver for a new client.</div></div>
+          <div class="notes-section">
+            <div class="notes-label">My Notes — Day 3</div>
+            <textarea class="notes-area" id="note-3" placeholder="What were the biggest differences between the good and bad listings you compared?" oninput="saveNote(3)"></textarea>
+            <div class="save-indicator" id="saved-3">Auto-saved</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Day 4 -->
+      <div class="day-card" id="card-4" style="--c:#c084fc">
+        <div class="day-header" onclick="toggle(4)">
+          <div class="day-num" style="background:#1e0e1e;color:#c084fc">D4</div>
+          <div class="day-info">
+            <div class="day-title">Pricing Strategy for Short-Term Rentals</div>
+            <div class="day-sub">Dynamic pricing, seasonality, demand signals</div>
+          </div>
+          <div class="day-meta">
+            <div class="day-time">~1.5 hrs</div>
+            <button class="check-btn" id="check-4" onclick="event.stopPropagation();markDay(4)">✓</button>
+            <div class="chevron">▾</div>
+          </div>
+        </div>
+        <div class="day-body">
+          <div class="task-list">
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Watch a PriceLabs tutorial on YouTube to understand dynamic pricing</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Look up Denver Airbnb prices on a regular weekend vs a major event weekend — note the difference</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Understand what "base price", "minimum price", and "max price" mean in pricing tools</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Read about the "race to the bottom" trap — why underpricing hurts more than helps</div></div>
+          </div>
+          <div class="resources">
+            <a href="https://www.youtube.com/results?search_query=pricelabs+tutorial" target="_blank" class="resource-link"><span class="resource-type type-yt">YT</span>PriceLabs tutorial</a>
+            <a href="https://pricelabs.co/blog" target="_blank" class="resource-link"><span class="resource-type type-read">Read</span>PriceLabs Blog</a>
+          </div>
+          <div class="insight"><div class="insight-label">Key Insight</div><div class="insight-text">Most underperforming hosts are either always priced too low (leaving money on the table) or too high (getting no bookings). Dynamic pricing fixes both automatically.</div></div>
+          <div class="notes-section">
+            <div class="notes-label">My Notes — Day 4</div>
+            <textarea class="notes-area" id="note-4" placeholder="How much did prices vary on event weekends vs normal weekends?" oninput="saveNote(4)"></textarea>
+            <div class="save-indicator" id="saved-4">Auto-saved</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Day 5 -->
+      <div class="day-card" id="card-5" style="--c:#facc15">
+        <div class="day-header" onclick="toggle(5)">
+          <div class="day-num" style="background:#222200;color:#facc15">D5</div>
+          <div class="day-info">
+            <div class="day-title">Guest Experience & Communication</div>
+            <div class="day-sub">What guests expect, reviews, automated messaging</div>
+          </div>
+          <div class="day-meta">
+            <div class="day-time">~1.5 hrs</div>
+            <button class="check-btn" id="check-5" onclick="event.stopPropagation();markDay(5)">✓</button>
+            <div class="chevron">▾</div>
+          </div>
+        </div>
+        <div class="day-body">
+          <div class="task-list">
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Read 20 recent 1-star Airbnb reviews on random listings — identify the most common complaints</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Read 20 recent 5-star reviews — identify what guests rave about most</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Learn what a guest journey looks like: inquiry → booking → check-in → stay → checkout → review</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Explore Hospitable.com to see how automated messaging templates work</div></div>
+          </div>
+          <div class="resources">
+            <a href="https://hospitable.com" target="_blank" class="resource-link"><span class="resource-type type-tool">Tool</span>Hospitable</a>
+            <a href="https://www.reddit.com/r/airbnb" target="_blank" class="resource-link"><span class="resource-type type-read">Read</span>r/airbnb — real complaints</a>
+          </div>
+          <div class="insight"><div class="insight-label">Key Insight</div><div class="insight-text">Most bad reviews come from communication failures — slow responses, unclear check-in, no expectation-setting. All of these are fixable with automation.</div></div>
+          <div class="notes-section">
+            <div class="notes-label">My Notes — Day 5</div>
+            <textarea class="notes-area" id="note-5" placeholder="What were the top 3 complaints in 1-star reviews? What did 5-star guests love most?" oninput="saveNote(5)"></textarea>
+            <div class="save-indicator" id="saved-5">Auto-saved</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Day 6 -->
+      <div class="day-card" id="card-6" style="--c:#f87171">
+        <div class="day-header" onclick="toggle(6)">
+          <div class="day-num" style="background:#1c0a0a;color:#f87171">D6</div>
+          <div class="day-info">
+            <div class="day-title">STR Regulations & Legality</div>
+            <div class="day-sub">Permits, city rules, what can get a listing removed</div>
+          </div>
+          <div class="day-meta">
+            <div class="day-time">~1.5 hrs</div>
+            <button class="check-btn" id="check-6" onclick="event.stopPropagation();markDay(6)">✓</button>
+            <div class="chevron">▾</div>
+          </div>
+        </div>
+        <div class="day-body">
+          <div class="task-list">
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Search "Denver short-term rental regulations 2026" — read the city's official rules</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Find out: does Denver require an STR license? Is there a primary residence rule?</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Understand HOA rules — many properties can't legally be listed on Airbnb</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Write a checklist of questions to ask every host before agreeing to manage their property</div></div>
+          </div>
+          <div class="resources">
+            <a href="https://www.denvergov.org/Government/Agencies-Departments-Offices/Agencies-Departments-Offices-Directory/Excise-and-Licenses/Business-Licenses/Short-Term-Rentals" target="_blank" class="resource-link"><span class="resource-type type-read">Read</span>Denver STR Rules</a>
+            <a href="https://www.reddit.com/r/airbnbhosts" target="_blank" class="resource-link"><span class="resource-type type-read">Read</span>r/airbnbhosts</a>
+          </div>
+          <div class="insight"><div class="insight-label">Key Insight</div><div class="insight-text">Always verify a listing is legally operating before agreeing to manage it. If it gets shut down, you lose income and potentially your reputation.</div></div>
+          <div class="notes-section">
+            <div class="notes-label">My Notes — Day 6</div>
+            <textarea class="notes-area" id="note-6" placeholder="What are Denver's specific STR rules? What questions will you ask every host?" oninput="saveNote(6)"></textarea>
+            <div class="save-indicator" id="saved-6">Auto-saved</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Day 7 -->
+      <div class="day-card" id="card-7" style="--c:#67e8f9">
+        <div class="day-header" onclick="toggle(7)">
+          <div class="day-num" style="background:#071218;color:#67e8f9">D7</div>
+          <div class="day-info">
+            <div class="day-title">Week 1 Review & Note Consolidation</div>
+            <div class="day-sub">Organize what you learned, identify gaps</div>
+          </div>
+          <div class="day-meta">
+            <div class="day-time">~1 hr</div>
+            <button class="check-btn" id="check-7" onclick="event.stopPropagation();markDay(7)">✓</button>
+            <div class="chevron">▾</div>
+          </div>
+        </div>
+        <div class="day-body">
+          <div class="task-list">
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Re-read all your notes from Days 1–6</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Write a one-paragraph summary: "What does a good Airbnb management business do?"</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">List 3 things you still don't fully understand — research those this weekend</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Watch one BiggerPockets STR podcast episode</div></div>
+          </div>
+          <div class="resources">
+            <a href="https://www.biggerpockets.com/podcast" target="_blank" class="resource-link"><span class="resource-type type-pod">Pod</span>BiggerPockets Podcast</a>
+          </div>
+          <div class="notes-section">
+            <div class="notes-label">My Notes — Day 7 (Weekly Summary)</div>
+            <textarea class="notes-area" id="note-7" placeholder="Write your week 1 summary here. What do you understand now that you didn't before?" oninput="saveNote(7)" style="min-height:120px"></textarea>
+            <div class="save-indicator" id="saved-7">Auto-saved</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WEEK 2 -->
+    <div class="week-panel" id="week-1">
+      <div class="week-label">Week 2 — Learn the business side: sales, contracts, operations</div>
+
+      <!-- Day 8 -->
+      <div class="day-card" id="card-8" style="--c:#38bdf8">
+        <div class="day-header" onclick="toggle(8)">
+          <div class="day-num" style="background:#0e2d3d;color:#38bdf8">D8</div>
+          <div class="day-info">
+            <div class="day-title">How to Identify Underperforming Listings</div>
+            <div class="day-sub">Signals, benchmarks, what to look for</div>
+          </div>
+          <div class="day-meta">
+            <div class="day-time">~2 hrs</div>
+            <button class="check-btn" id="check-8" onclick="event.stopPropagation();markDay(8)">✓</button>
+            <div class="chevron">▾</div>
+          </div>
+        </div>
+        <div class="day-body">
+          <div class="task-list">
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Browse 30 Denver Airbnb listings — sort by "Price: low to high"</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">For 5 listings: estimate their monthly revenue (price × estimated nights booked)</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">List every signal of underperformance you can spot (few reviews, old photos, no description, low price)</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Sign up for AirDNA free trial — look at Denver market averages vs the listings you found</div></div>
+          </div>
+          <div class="resources">
+            <a href="https://www.airdna.co" target="_blank" class="resource-link"><span class="resource-type type-tool">Tool</span>AirDNA free trial</a>
+            <a href="https://www.airbnb.com/s/Denver--CO/homes" target="_blank" class="resource-link"><span class="resource-type type-read">Read</span>Browse Denver listings</a>
+          </div>
+          <div class="insight"><div class="insight-label">Key Insight</div><div class="insight-text">An underperformer in a strong market is your best lead — the market proves the property should earn more. Your job is to show them the gap with data.</div></div>
+          <div class="notes-section">
+            <div class="notes-label">My Notes — Day 8</div>
+            <textarea class="notes-area" id="note-8" placeholder="What signals of underperformance did you spot? What was the biggest revenue gap you found?" oninput="saveNote(8)"></textarea>
+            <div class="save-indicator" id="saved-8">Auto-saved</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Day 9 -->
+      <div class="day-card" id="card-9" style="--c:#4ade80">
+        <div class="day-header" onclick="toggle(9)">
+          <div class="day-num" style="background:#0e220e;color:#4ade80">D9</div>
+          <div class="day-info">
+            <div class="day-title">How to Pitch Hosts — The Sales Conversation</div>
+            <div class="day-sub">What to say, objections, how to close</div>
+          </div>
+          <div class="day-meta">
+            <div class="day-time">~2 hrs</div>
+            <button class="check-btn" id="check-9" onclick="event.stopPropagation();markDay(9)">✓</button>
+            <div class="chevron">▾</div>
+          </div>
+        </div>
+        <div class="day-body">
+          <div class="task-list">
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Watch 2 videos on "how to get Airbnb management clients" on YouTube</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Write out your 60-second pitch — what you offer and why they should care</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">List 5 common objections hosts will give you and write a response to each</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Practice your pitch out loud 3 times — time yourself</div></div>
+          </div>
+          <div class="resources">
+            <a href="https://www.youtube.com/results?search_query=how+to+get+airbnb+management+clients" target="_blank" class="resource-link"><span class="resource-type type-yt">YT</span>Getting clients</a>
+            <a href="https://www.reddit.com/r/airbnbhosts" target="_blank" class="resource-link"><span class="resource-type type-read">Read</span>Host pain points</a>
+          </div>
+          <div class="insight"><div class="insight-label">Key Insight</div><div class="insight-text">Don't sell management — sell the revenue gap. "You're earning $2,400/month. I can get you to $4,800. My 20% fee pays for itself in month one."</div></div>
+          <div class="notes-section">
+            <div class="notes-label">My Notes — Day 9</div>
+            <textarea class="notes-area" id="note-9" placeholder="Write your 60-second pitch here. What objections came up and how will you handle them?" oninput="saveNote(9)" style="min-height:120px"></textarea>
+            <div class="save-indicator" id="saved-9">Auto-saved</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Day 10 -->
+      <div class="day-card" id="card-10" style="--c:#fb923c">
+        <div class="day-header" onclick="toggle(10)">
+          <div class="day-num" style="background:#221200;color:#fb923c">D10</div>
+          <div class="day-info">
+            <div class="day-title">Management Contracts & Fee Structures</div>
+            <div class="day-sub">What to include, what to avoid, legal basics</div>
+          </div>
+          <div class="day-meta">
+            <div class="day-time">~2 hrs</div>
+            <button class="check-btn" id="check-10" onclick="event.stopPropagation();markDay(10)">✓</button>
+            <div class="chevron">▾</div>
+          </div>
+        </div>
+        <div class="day-body">
+          <div class="task-list">
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Search "Airbnb property management contract template" — read 2–3 examples</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Note what clauses they include: payment terms, termination, liability, scope of services</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Decide your fee structure: % of revenue, flat fee, or hybrid?</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Draft a simple one-page scope of services document listing exactly what you do and don't do</div></div>
+          </div>
+          <div class="resources">
+            <a href="https://www.pandadoc.com/property-management-agreement-template/" target="_blank" class="resource-link"><span class="resource-type type-read">Read</span>Contract template</a>
+            <a href="https://pandadoc.com" target="_blank" class="resource-link"><span class="resource-type type-tool">Tool</span>PandaDoc</a>
+          </div>
+          <div class="insight"><div class="insight-label">Key Insight</div><div class="insight-text">Your contract protects you. Clearly define what happens if a host cancels early, who covers maintenance costs, and how you handle damage claims.</div></div>
+          <div class="notes-section">
+            <div class="notes-label">My Notes — Day 10</div>
+            <textarea class="notes-area" id="note-10" placeholder="What fee structure will you use? What clauses are most important in your contract?" oninput="saveNote(10)"></textarea>
+            <div class="save-indicator" id="saved-10">Auto-saved</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Day 11 -->
+      <div class="day-card" id="card-11" style="--c:#c084fc">
+        <div class="day-header" onclick="toggle(11)">
+          <div class="day-num" style="background:#1e0e1e;color:#c084fc">D11</div>
+          <div class="day-info">
+            <div class="day-title">Operations Tools Deep Dive</div>
+            <div class="day-sub">Hospitable, PriceLabs, Turno — hands-on exploration</div>
+          </div>
+          <div class="day-meta">
+            <div class="day-time">~2 hrs</div>
+            <button class="check-btn" id="check-11" onclick="event.stopPropagation();markDay(11)">✓</button>
+            <div class="chevron">▾</div>
+          </div>
+        </div>
+        <div class="day-body">
+          <div class="task-list">
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Sign up for Hospitable free trial — explore the messaging automation features</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Sign up for PriceLabs — watch their onboarding video</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Explore Turno.com — understand how cleaner scheduling works</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Write down: how long would operations take per property per week with these tools vs without?</div></div>
+          </div>
+          <div class="resources">
+            <a href="https://hospitable.com" target="_blank" class="resource-link"><span class="resource-type type-tool">Tool</span>Hospitable</a>
+            <a href="https://pricelabs.co" target="_blank" class="resource-link"><span class="resource-type type-tool">Tool</span>PriceLabs</a>
+            <a href="https://turno.com" target="_blank" class="resource-link"><span class="resource-type type-tool">Tool</span>Turno</a>
+          </div>
+          <div class="insight"><div class="insight-label">Key Insight</div><div class="insight-text">With the right tools, managing one property should take under 2 hours per week. This is how you scale to 10+ properties without hiring a team first.</div></div>
+          <div class="notes-section">
+            <div class="notes-label">My Notes — Day 11</div>
+            <textarea class="notes-area" id="note-11" placeholder="What did you discover about each tool? What will save you the most time?" oninput="saveNote(11)"></textarea>
+            <div class="save-indicator" id="saved-11">Auto-saved</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Day 12 -->
+      <div class="day-card" id="card-12" style="--c:#facc15">
+        <div class="day-header" onclick="toggle(12)">
+          <div class="day-num" style="background:#222200;color:#facc15">D12</div>
+          <div class="day-info">
+            <div class="day-title">Financial Modeling — What Can You Actually Earn</div>
+            <div class="day-sub">Revenue projections, scaling math, break-even</div>
+          </div>
+          <div class="day-meta">
+            <div class="day-time">~1.5 hrs</div>
+            <button class="check-btn" id="check-12" onclick="event.stopPropagation();markDay(12)">✓</button>
+            <div class="chevron">▾</div>
+          </div>
+        </div>
+        <div class="day-body">
+          <div class="task-list">
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Build a simple spreadsheet: if you manage 5 properties at $4,800 avg revenue at 20% — what do you earn?</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Calculate your tool costs per property (Hospitable + PriceLabs + Turno)</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Figure out: how many properties do you need to replace your current income?</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Set a 90-day goal: how many clients by end of month 3?</div></div>
+          </div>
+          <div class="resources">
+            <a href="https://sheets.google.com" target="_blank" class="resource-link"><span class="resource-type type-tool">Tool</span>Google Sheets</a>
+          </div>
+          <div class="insight"><div class="insight-label">Key Insight</div><div class="insight-text">10 properties × $4,800 avg revenue × 20% = $9,600/month. Tool costs ~$800/month. Net: ~$8,800/month. That's your target.</div></div>
+          <div class="notes-section">
+            <div class="notes-label">My Notes — Day 12</div>
+            <textarea class="notes-area" id="note-12" placeholder="What's your income target? How many properties do you need? What's your 90-day goal?" oninput="saveNote(12)" style="min-height:120px"></textarea>
+            <div class="save-indicator" id="saved-12">Auto-saved</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Day 13 -->
+      <div class="day-card" id="card-13" style="--c:#f87171">
+        <div class="day-header" onclick="toggle(13)">
+          <div class="day-num" style="background:#1c0a0a;color:#f87171">D13</div>
+          <div class="day-info">
+            <div class="day-title">Build Your Onboarding Process</div>
+            <div class="day-sub">Step-by-step checklist for when you sign your first client</div>
+          </div>
+          <div class="day-meta">
+            <div class="day-time">~2 hrs</div>
+            <button class="check-btn" id="check-13" onclick="event.stopPropagation();markDay(13)">✓</button>
+            <div class="chevron">▾</div>
+          </div>
+        </div>
+        <div class="day-body">
+          <div class="task-list">
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Write a 10-step onboarding checklist you'll use for every new client</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Draft your "welcome to management" email that you send right after signing</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Create a Notion page (notion.so — free) to store your SOPs and client info</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Write a list of everything you'll need from the host on Day 1 (access, photos, info, keys)</div></div>
+          </div>
+          <div class="resources">
+            <a href="https://notion.so" target="_blank" class="resource-link"><span class="resource-type type-tool">Tool</span>Notion — free</a>
+          </div>
+          <div class="insight"><div class="insight-label">Key Insight</div><div class="insight-text">A smooth onboarding builds instant trust. Hosts judge your professionalism in the first 48 hours — have a process ready before you sign anyone.</div></div>
+          <div class="notes-section">
+            <div class="notes-label">My Notes — Day 13</div>
+            <textarea class="notes-area" id="note-13" placeholder="Write your onboarding checklist here. What do you need from the host on Day 1?" oninput="saveNote(13)" style="min-height:120px"></textarea>
+            <div class="save-indicator" id="saved-13">Auto-saved</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Day 14 -->
+      <div class="day-card" id="card-14" style="--c:#67e8f9">
+        <div class="day-header" onclick="toggle(14)">
+          <div class="day-num" style="background:#071218;color:#67e8f9">D14</div>
+          <div class="day-info">
+            <div class="day-title">Week 2 Review — You're Ready to Go Live</div>
+            <div class="day-sub">Consolidate, identify gaps, confirm you're ready</div>
+          </div>
+          <div class="day-meta">
+            <div class="day-time">~1 hr</div>
+            <button class="check-btn" id="check-14" onclick="event.stopPropagation();markDay(14)">✓</button>
+            <div class="chevron">▾</div>
+          </div>
+        </div>
+        <div class="day-body">
+          <div class="task-list">
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Re-read all Week 2 notes</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Answer: could you explain this business to a stranger in 2 minutes? Practice it.</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Answer: could you handle a discovery call with a host tomorrow? What would you say?</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">If yes to both — you're ready for Week 3. If not, spend today on whichever area needs more work.</div></div>
+          </div>
+          <div class="notes-section">
+            <div class="notes-label">My Notes — Day 14 (Week 2 Summary)</div>
+            <textarea class="notes-area" id="note-14" placeholder="Are you ready? What's still unclear? Write your 2-minute business explanation here." oninput="saveNote(14)" style="min-height:120px"></textarea>
+            <div class="save-indicator" id="saved-14">Auto-saved</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WEEK 3 -->
+    <div class="week-panel" id="week-2">
+      <div class="week-label">Week 3 — Set up every tool and launch your first campaign</div>
+
+      <!-- Day 15 -->
+      <div class="day-card" id="card-15" style="--c:#4ade80">
+        <div class="day-header" onclick="toggle(15)">
+          <div class="day-num" style="background:#0e220e;color:#4ade80">D15</div>
+          <div class="day-info">
+            <div class="day-title">Set Up Airtable</div>
+            <div class="day-sub">Build your lead database</div>
+          </div>
+          <div class="day-meta">
+            <div class="day-time">~1 hr</div>
+            <button class="check-btn" id="check-15" onclick="event.stopPropagation();markDay(15)">✓</button>
+            <div class="chevron">▾</div>
+          </div>
+        </div>
+        <div class="day-body">
+          <div class="task-list">
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Create Airtable account at airtable.com</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Create base "Airbnb Lead Pipeline" with Leads and Clients tables</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Add all fields from the workflow (open index.html → Lead Generation panel)</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Copy your Base ID from the URL and save it in your notes below</div></div>
+          </div>
+          <div class="resources">
+            <a href="https://airtable.com" target="_blank" class="resource-link"><span class="resource-type type-tool">Tool</span>Airtable</a>
+            <a href="index.html" target="_blank" class="resource-link"><span class="resource-type type-read">Read</span>View Workflow</a>
+          </div>
+          <div class="notes-section">
+            <div class="notes-label">My Notes — Day 15</div>
+            <textarea class="notes-area" id="note-15" placeholder="Paste your Airtable Base ID here so you don't lose it: appXXXXXXXXX" oninput="saveNote(15)"></textarea>
+            <div class="save-indicator" id="saved-15">Auto-saved</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Day 16 -->
+      <div class="day-card" id="card-16" style="--c:#38bdf8">
+        <div class="day-header" onclick="toggle(16)">
+          <div class="day-num" style="background:#0e2d3d;color:#38bdf8">D16</div>
+          <div class="day-info">
+            <div class="day-title">Set Up Apify & Run First Scrape</div>
+            <div class="day-sub">Get your first 200 Denver leads</div>
+          </div>
+          <div class="day-meta">
+            <div class="day-time">~1 hr</div>
+            <button class="check-btn" id="check-16" onclick="event.stopPropagation();markDay(16)">✓</button>
+            <div class="chevron">▾</div>
+          </div>
+        </div>
+        <div class="day-body">
+          <div class="task-list">
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Create Apify account at apify.com</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Find "Airbnb Scraper" by Voyager in the Actor store</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Paste the config from the workflow and run it</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Save your Apify API key in your notes below</div></div>
+          </div>
+          <div class="resources">
+            <a href="https://apify.com" target="_blank" class="resource-link"><span class="resource-type type-tool">Tool</span>Apify</a>
+          </div>
+          <div class="notes-section">
+            <div class="notes-label">My Notes — Day 16</div>
+            <textarea class="notes-area" id="note-16" placeholder="Paste your Apify API key here: apify_api_XXXXXXX" oninput="saveNote(16)"></textarea>
+            <div class="save-indicator" id="saved-16">Auto-saved</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Day 17 -->
+      <div class="day-card" id="card-17" style="--c:#fb923c">
+        <div class="day-header" onclick="toggle(17)">
+          <div class="day-num" style="background:#221200;color:#fb923c">D17</div>
+          <div class="day-info">
+            <div class="day-title">Set Up Instantly.ai & Email Campaign</div>
+            <div class="day-sub">Connect your email and load the 3-step sequence</div>
+          </div>
+          <div class="day-meta">
+            <div class="day-time">~1.5 hrs</div>
+            <button class="check-btn" id="check-17" onclick="event.stopPropagation();markDay(17)">✓</button>
+            <div class="chevron">▾</div>
+          </div>
+        </div>
+        <div class="day-body">
+          <div class="task-list">
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Create Instantly.ai account and connect your outreach email</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Create campaign "Denver Airbnb Hosts" with the 3 emails from the workflow</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Set daily send limit to 30/day</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Save your API key and Campaign ID in your notes below</div></div>
+          </div>
+          <div class="resources">
+            <a href="https://instantly.ai" target="_blank" class="resource-link"><span class="resource-type type-tool">Tool</span>Instantly.ai</a>
+          </div>
+          <div class="notes-section">
+            <div class="notes-label">My Notes — Day 17</div>
+            <textarea class="notes-area" id="note-17" placeholder="Instantly API Key: &#10;Campaign ID: " oninput="saveNote(17)"></textarea>
+            <div class="save-indicator" id="saved-17">Auto-saved</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Day 18 -->
+      <div class="day-card" id="card-18" style="--c:#a855f7">
+        <div class="day-header" onclick="toggle(18)">
+          <div class="day-num" style="background:#200a2a;color:#a855f7">D18</div>
+          <div class="day-info">
+            <div class="day-title">Set Up Make.com — Import the Blueprint</div>
+            <div class="day-sub">Connect Apify → Airtable → Instantly automatically</div>
+          </div>
+          <div class="day-meta">
+            <div class="day-time">~2 hrs</div>
+            <button class="check-btn" id="check-18" onclick="event.stopPropagation();markDay(18)">✓</button>
+            <div class="chevron">▾</div>
+          </div>
+        </div>
+        <div class="day-body">
+          <div class="task-list">
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Create Make.com account at make.com</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Import make-blueprint.json from the workflow folder</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Replace all API key placeholders (Apify, Airtable, Instantly) using notes from Days 15–17</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Schedule the scenario to run every Monday at 9am</div></div>
+          </div>
+          <div class="resources">
+            <a href="https://make.com" target="_blank" class="resource-link"><span class="resource-type type-tool">Tool</span>Make.com</a>
+            <a href="index.html#make" target="_blank" class="resource-link"><span class="resource-type type-read">Read</span>Make.com setup guide</a>
+          </div>
+          <div class="notes-section">
+            <div class="notes-label">My Notes — Day 18</div>
+            <textarea class="notes-area" id="note-18" placeholder="Any errors when setting up Make? What did you get stuck on?" oninput="saveNote(18)"></textarea>
+            <div class="save-indicator" id="saved-18">Auto-saved</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Day 19 -->
+      <div class="day-card" id="card-19" style="--c:#facc15">
+        <div class="day-header" onclick="toggle(19)">
+          <div class="day-num" style="background:#222200;color:#facc15">D19</div>
+          <div class="day-info">
+            <div class="day-title">Test the Full Workflow End to End</div>
+            <div class="day-sub">Run everything, verify leads appear in Airtable</div>
+          </div>
+          <div class="day-meta">
+            <div class="day-time">~1.5 hrs</div>
+            <button class="check-btn" id="check-19" onclick="event.stopPropagation();markDay(19)">✓</button>
+            <div class="chevron">▾</div>
+          </div>
+        </div>
+        <div class="day-body">
+          <div class="task-list">
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Click "Run once" in Make.com</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Wait 10 minutes — open Airtable and confirm leads appeared</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Open Instantly and confirm leads were added to the campaign</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Fix any errors — come back to this page for help if needed</div></div>
+          </div>
+          <div class="notes-section">
+            <div class="notes-label">My Notes — Day 19</div>
+            <textarea class="notes-area" id="note-19" placeholder="How many leads came through? Any errors? What did the data look like?" oninput="saveNote(19)"></textarea>
+            <div class="save-indicator" id="saved-19">Auto-saved</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Day 20 -->
+      <div class="day-card" id="card-20" style="--c:#4ade80">
+        <div class="day-header" onclick="toggle(20)">
+          <div class="day-num" style="background:#0e220e;color:#4ade80">D20</div>
+          <div class="day-info">
+            <div class="day-title">Launch First Outreach Campaign</div>
+            <div class="day-sub">Your first emails go out today</div>
+          </div>
+          <div class="day-meta">
+            <div class="day-time">~1 hr</div>
+            <button class="check-btn" id="check-20" onclick="event.stopPropagation();markDay(20)">✓</button>
+            <div class="chevron">▾</div>
+          </div>
+        </div>
+        <div class="day-body">
+          <div class="task-list">
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Review the first 10 leads in Airtable — do they look like real underperformers?</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Activate the Instantly campaign — emails start sending today</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Set up a Calendly link for 15-min discovery calls</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Create a free HubSpot account to track replies and deals</div></div>
+          </div>
+          <div class="resources">
+            <a href="https://calendly.com" target="_blank" class="resource-link"><span class="resource-type type-tool">Tool</span>Calendly</a>
+            <a href="https://hubspot.com" target="_blank" class="resource-link"><span class="resource-type type-tool">Tool</span>HubSpot CRM</a>
+          </div>
+          <div class="insight"><div class="insight-label">Key Insight</div><div class="insight-text">Your first campaign is live. Expect a 2–5% reply rate on a cold list. That's 4–10 replies from 200 emails — potentially 1–2 discovery calls.</div></div>
+          <div class="notes-section">
+            <div class="notes-label">My Notes — Day 20</div>
+            <textarea class="notes-area" id="note-20" placeholder="Campaign is live! How many leads went in? Any immediate replies?" oninput="saveNote(20)"></textarea>
+            <div class="save-indicator" id="saved-20">Auto-saved</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Day 21 -->
+      <div class="day-card" id="card-21" style="--c:#ff5a5f">
+        <div class="day-header" onclick="toggle(21)">
+          <div class="day-num" style="background:#1a0505;color:#ff5a5f">D21</div>
+          <div class="day-info">
+            <div class="day-title">Review, Refine & Keep Going</div>
+            <div class="day-sub">You've completed the 21-day plan — now scale it</div>
+          </div>
+          <div class="day-meta">
+            <div class="day-time">~1 hr</div>
+            <button class="check-btn" id="check-21" onclick="event.stopPropagation();markDay(21)">✓</button>
+            <div class="chevron">▾</div>
+          </div>
+        </div>
+        <div class="day-body">
+          <div class="task-list">
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Re-read all your notes from the 21 days</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Check your Instantly campaign — any opens, replies, or bounces?</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Write your 30-day goal: how many clients, how much revenue</div></div>
+            <div class="task" onclick="toggleTask(this)"><div class="task-check">✓</div><div class="task-text">Keep the Make.com scenario running every Monday — the pipeline feeds itself from here</div></div>
+          </div>
+          <div class="insight"><div class="insight-label">You made it</div><div class="insight-text">In 3 weeks you went from zero knowledge to a fully automated lead generation system running in a real market. The next step is your first signed client.</div></div>
+          <div class="notes-section">
+            <div class="notes-label">My Notes — Day 21 (Final Reflection)</div>
+            <textarea class="notes-area" id="note-21" placeholder="What's your 30-day goal? What would make this first month a success?" oninput="saveNote(21)" style="min-height:120px"></textarea>
+            <div class="save-indicator" id="saved-21">Auto-saved</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALL NOTES -->
+    <div class="week-panel" id="week-3">
+      <div class="week-label">All My Notes</div>
+      <div id="all-notes-container"></div>
+    </div>
+
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-title">Your Progress</div>
+      <div class="sidebar-stat"><div class="sidebar-stat-label">Days completed</div><div class="sidebar-stat-val" id="sb-done">0 / 21</div></div>
+      <div class="sidebar-stat"><div class="sidebar-stat-label">Current week</div><div class="sidebar-stat-val" id="sb-week">Week 1</div></div>
+      <div class="sidebar-stat"><div class="sidebar-stat-label">Notes written</div><div class="sidebar-stat-val" id="sb-notes">0</div></div>
+    </div>
+    <div class="sidebar-card">
+      <div class="sidebar-title">Key Resources</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <a href="https://www.youtube.com/@Robuilt" target="_blank" class="resource-link"><span class="resource-type type-yt">YT</span>Robuilt</a>
+        <a href="https://www.youtube.com/@SeanRakidzich" target="_blank" class="resource-link"><span class="resource-type type-yt">YT</span>Sean Rakidzich</a>
+        <a href="https://www.biggerpockets.com/podcast" target="_blank" class="resource-link"><span class="resource-type type-pod">Pod</span>BiggerPockets</a>
+        <a href="https://www.reddit.com/r/airbnbhosts" target="_blank" class="resource-link"><span class="resource-type type-read">Read</span>r/airbnbhosts</a>
+        <a href="https://www.airdna.co" target="_blank" class="resource-link"><span class="resource-type type-tool">Tool</span>AirDNA</a>
+        <a href="index.html" class="resource-link"><span class="resource-type type-read">→</span>Back to Workflow</a>
+      </div>
+    </div>
+    <div class="sidebar-card">
+      <div class="sidebar-title">Income Calculator</div>
+      <div style="font-size:12px;color:#555;margin-bottom:10px">Drag to estimate your target</div>
+      <div style="margin-bottom:10px">
+        <div style="font-size:11px;color:#444;margin-bottom:4px">Properties managed</div>
+        <input type="range" min="1" max="20" value="5" oninput="calcIncome()" id="prop-slider" style="width:100%;accent-color:#ff5a5f">
+        <div style="font-size:13px;font-weight:700;color:#fff;margin-top:4px"><span id="prop-count">5</span> properties</div>
+      </div>
+      <div style="margin-bottom:10px">
+        <div style="font-size:11px;color:#444;margin-bottom:4px">Avg monthly revenue per property</div>
+        <input type="range" min="1000" max="10000" step="100" value="4800" oninput="calcIncome()" id="rev-slider" style="width:100%;accent-color:#ff5a5f">
+        <div style="font-size:13px;font-weight:700;color:#fff;margin-top:4px">$<span id="rev-val">4,800</span>/mo</div>
+      </div>
+      <div style="background:#0d0d0d;border:1px solid #1e1e1e;border-radius:10px;padding:12px;margin-top:8px">
+        <div style="font-size:11px;color:#555;margin-bottom:4px">Your monthly income (20%)</div>
+        <div style="font-size:24px;font-weight:800;color:#ff5a5f" id="calc-result">$4,800</div>
+        <div style="font-size:11px;color:#444;margin-top:4px" id="calc-annual">$57,600/year</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Notes auto-save to localStorage
+  function saveNote(day) {
+    const val = document.getElementById('note-' + day).value;
+    localStorage.setItem('note-' + day, val);
+    const ind = document.getElementById('saved-' + day);
+    ind.textContent = 'Saved ✓';
+    ind.classList.add('saved');
+    setTimeout(() => { ind.textContent = 'Auto-saved'; ind.classList.remove('saved'); }, 1500);
+    updateSidebar();
+  }
+
+  function loadNotes() {
+    for (let i = 1; i <= 21; i++) {
+      const saved = localStorage.getItem('note-' + i);
+      if (saved && document.getElementById('note-' + i)) {
+        document.getElementById('note-' + i).value = saved;
+      }
+      const done = localStorage.getItem('day-done-' + i);
+      if (done) {
+        document.getElementById('check-' + i).classList.add('done');
+        document.getElementById('card-' + i).classList.add('done');
+      }
+    }
+    updateProgress();
+    updateSidebar();
+  }
+
+  function markDay(i) {
+    const btn = document.getElementById('check-' + i);
+    const card = document.getElementById('card-' + i);
+    if (btn.classList.contains('done')) {
+      btn.classList.remove('done');
+      card.classList.remove('done');
+      localStorage.removeItem('day-done-' + i);
+    } else {
+      btn.classList.add('done');
+      card.classList.add('done');
+      localStorage.setItem('day-done-' + i, '1');
+    }
+    updateProgress();
+    updateSidebar();
+  }
+
+  function updateProgress() {
+    let done = 0;
+    for (let i = 1; i <= 21; i++) {
+      if (localStorage.getItem('day-done-' + i)) done++;
+    }
+    document.getElementById('done-count').textContent = done;
+    document.getElementById('progress-bar').style.width = (done / 21 * 100) + '%';
+  }
+
+  function updateSidebar() {
+    let done = 0, notes = 0;
+    for (let i = 1; i <= 21; i++) {
+      if (localStorage.getItem('day-done-' + i)) done++;
+      if (localStorage.getItem('note-' + i)?.trim()) notes++;
+    }
+    document.getElementById('sb-done').textContent = done + ' / 21';
+    document.getElementById('sb-notes').textContent = notes;
+    const week = done < 7 ? 'Week 1' : done < 14 ? 'Week 2' : 'Week 3';
+    document.getElementById('sb-week').textContent = week;
+  }
+
+  function toggle(i) {
+    const card = document.getElementById('card-' + i);
+    card.classList.toggle('open');
+  }
+
+  function toggleTask(el) {
+    el.querySelector('.task-check').classList.toggle('done');
+    el.querySelector('.task-text').classList.toggle('done');
+  }
+
+  let currentWeek = 0;
+  function showWeek(i) {
+    document.querySelectorAll('.week-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.week-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('week-' + i).classList.add('active');
+    document.querySelectorAll('.week-tab')[i].classList.add('active');
+    currentWeek = i;
+    if (i === 3) renderAllNotes();
+  }
+
+  function renderAllNotes() {
+    const days = [
+      'How Airbnb Works','The Co-Hosting Model','Listing Performance','Pricing Strategy','Guest Experience','STR Regulations','Week 1 Review',
+      'Identifying Underperformers','Pitching Hosts','Contracts & Fees','Operations Tools','Financial Modeling','Onboarding Process','Week 2 Review',
+      'Airtable Setup','Apify Setup','Instantly Setup','Make.com Setup','Full Workflow Test','Campaign Launch','Final Reflection'
+    ];
+    const container = document.getElementById('all-notes-container');
+    let html = '';
+    let hasAny = false;
+    for (let i = 1; i <= 21; i++) {
+      const note = localStorage.getItem('note-' + i);
+      if (note?.trim()) {
+        hasAny = true;
+        html += `<div class="note-item"><div class="note-day">Day ${i} — ${days[i-1]}</div><div class="note-content">${note.replace(/</g,'&lt;')}</div></div>`;
+      }
+    }
+    container.innerHTML = hasAny ? `<div class="all-notes">${html}</div>` : '<div class="no-notes">No notes yet. Start writing in the day cards above.</div>';
+  }
+
+  function calcIncome() {
+    const props = parseInt(document.getElementById('prop-slider').value);
+    const rev = parseInt(document.getElementById('rev-slider').value);
+    const income = props * rev * 0.20;
+    document.getElementById('prop-count').textContent = props;
+    document.getElementById('rev-val').textContent = rev.toLocaleString();
+    document.getElementById('calc-result').textContent = '$' + income.toLocaleString();
+    document.getElementById('calc-annual').textContent = '$' + (income * 12).toLocaleString() + '/year';
+  }
+
+  loadNotes();
+  calcIncome();
+</script>
+</body>
+</html>
