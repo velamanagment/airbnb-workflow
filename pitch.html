@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vela Management — Business Overview</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #080808; color: #f0f0f0; }
+    a { color: inherit; text-decoration: none; }
+
+    /* GLOBAL */
+    .section { padding: 80px 24px; max-width: 1100px; margin: 0 auto; }
+    .section-tag { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #ff5a5f; margin-bottom: 12px; }
+    .section-title { font-size: 36px; font-weight: 800; line-height: 1.2; margin-bottom: 16px; }
+    .section-sub { font-size: 16px; color: #666; line-height: 1.6; max-width: 600px; }
+    .divider { border: none; border-top: 1px solid #1a1a1a; }
+
+    /* HERO */
+    .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 80px 24px; max-width: 1100px; margin: 0 auto; }
+    .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: #ff5a5f15; border: 1px solid #ff5a5f30; border-radius: 20px; padding: 6px 14px; font-size: 12px; color: #ff5a5f; font-weight: 600; margin-bottom: 32px; }
+    .hero h1 { font-size: clamp(42px, 7vw, 80px); font-weight: 900; line-height: 1.05; letter-spacing: -2px; margin-bottom: 24px; }
+    .hero h1 span { color: #ff5a5f; }
+    .hero-sub { font-size: 20px; color: #555; line-height: 1.6; max-width: 600px; margin-bottom: 48px; }
+    .hero-stats { display: flex; gap: 48px; flex-wrap: wrap; }
+    .hero-stat-val { font-size: 42px; font-weight: 900; color: #fff; }
+    .hero-stat-label { font-size: 13px; color: #444; margin-top: 4px; }
+
+    /* OPPORTUNITY */
+    .opp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-top: 48px; }
+    .opp-card { background: #111; border: 1px solid #1e1e1e; border-radius: 16px; padding: 24px; }
+    .opp-card-icon { font-size: 28px; margin-bottom: 12px; }
+    .opp-card-val { font-size: 32px; font-weight: 800; margin-bottom: 4px; }
+    .opp-card-label { font-size: 12px; color: #555; line-height: 1.5; }
+
+    /* PIPELINE */
+    .pipeline { margin-top: 48px; }
+    .pipe-step { display: flex; gap: 24px; margin-bottom: 4px; }
+    .pipe-left { display: flex; flex-direction: column; align-items: center; width: 48px; flex-shrink: 0; }
+    .pipe-dot { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .pipe-line { width: 2px; flex: 1; min-height: 20px; margin: 4px 0; }
+    .pipe-body { flex: 1; padding-bottom: 28px; }
+    .pipe-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; padding-top: 10px; }
+    .pipe-desc { font-size: 13px; color: #666; line-height: 1.6; margin-bottom: 12px; }
+    .pipe-tools { display: flex; flex-wrap: wrap; gap: 8px; }
+    .pipe-tool { font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 20px; border: 1px solid; }
+
+    /* BEFORE AFTER */
+    .ba-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 48px; }
+    .ba-card { border-radius: 16px; padding: 28px; }
+    .ba-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; }
+    .ba-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .ba-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .ba-row-label { font-size: 13px; color: #888; }
+    .ba-row-val { font-size: 15px; font-weight: 700; }
+    .gap-card { background: linear-gradient(135deg, #ff5a5f15, #fb923c15); border: 1px solid #ff5a5f30; border-radius: 16px; padding: 28px; margin-top: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+    .gap-num { font-size: 48px; font-weight: 900; color: #ff5a5f; }
+    .gap-label { font-size: 14px; color: #888; margin-top: 4px; }
+
+    /* AUTOMATION GRID */
+    .auto-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 48px; }
+    .auto-card { background: #111; border: 1px solid #1e1e1e; border-radius: 16px; padding: 24px; }
+    .auto-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .auto-icon { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .auto-title { font-size: 15px; font-weight: 700; }
+    .auto-sub { font-size: 11px; color: #555; margin-top: 2px; }
+    .auto-items { display: flex; flex-direction: column; gap: 8px; }
+    .auto-item { display: flex; align-items: flex-start; gap: 10px; font-size: 12px; color: #888; line-height: 1.5; }
+    .auto-dot { width: 6px; height: 6px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+
+    /* TECH STACK */
+    .stack-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-top: 48px; }
+    .stack-card { background: #111; border: 1px solid #1e1e1e; border-radius: 14px; padding: 20px 16px; text-align: center; transition: border-color 0.2s, transform 0.2s; }
+    .stack-card:hover { border-color: #ff5a5f40; transform: translateY(-2px); }
+    .stack-emoji { font-size: 28px; margin-bottom: 8px; }
+    .stack-name { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+    .stack-role { font-size: 11px; color: #555; line-height: 1.4; }
+    .stack-badge { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 10px; margin-top: 8px; font-weight: 600; }
+
+    /* REVENUE MODEL */
+    .rev-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 48px; }
+    .rev-card { background: #111; border: 1px solid #1e1e1e; border-radius: 16px; padding: 28px; }
+    .rev-title { font-size: 14px; color: #555; margin-bottom: 8px; }
+    .rev-val { font-size: 36px; font-weight: 900; margin-bottom: 4px; }
+    .rev-sub { font-size: 12px; color: #444; }
+    .rev-table { width: 100%; margin-top: 24px; border-collapse: collapse; }
+    .rev-table td { padding: 10px 0; border-bottom: 1px solid #1a1a1a; font-size: 13px; color: #888; }
+    .rev-table td:last-child { text-align: right; font-weight: 700; color: #fff; }
+
+    /* FLOW DIAGRAM */
+    .flow { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 48px; }
+    .flow-node { background: #111; border: 1px solid #1e1e1e; border-radius: 10px; padding: 10px 16px; font-size: 12px; font-weight: 600; }
+    .flow-node.colored { border-color: var(--c); color: var(--c); background: var(--bg); }
+    .flow-arr { color: #333; font-size: 18px; }
+
+    /* VOICE AI */
+    .voice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 32px; }
+    .voice-card { background: #111; border: 1px solid #1e1e1e; border-radius: 12px; padding: 18px; }
+    .voice-scenario { font-size: 12px; font-weight: 700; color: #a855f7; margin-bottom: 6px; }
+    .voice-response { font-size: 12px; color: #666; line-height: 1.5; }
+
+    /* NAV */
+    .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; background: rgba(8,8,8,0.9); backdrop-filter: blur(12px); border-bottom: 1px solid #1a1a1a; }
+    .nav-logo { font-size: 16px; font-weight: 800; }
+    .nav-logo span { color: #ff5a5f; }
+    .nav-links { display: flex; gap: 24px; }
+    .nav-link { font-size: 12px; color: #555; cursor: pointer; transition: color 0.15s; }
+    .nav-link:hover { color: #fff; }
+
+    /* FOOTER */
+    .footer { padding: 48px 24px; text-align: center; border-top: 1px solid #1a1a1a; color: #333; font-size: 13px; }
+
+    /* MOBILE */
+    @media (max-width: 768px) {
+      .ba-wrap { grid-template-columns: 1fr; }
+      .rev-grid { grid-template-columns: 1fr; }
+      .voice-grid { grid-template-columns: 1fr; }
+      .hero-stats { gap: 24px; }
+      .section-title { font-size: 28px; }
+      .hero h1 { font-size: 38px; }
+      .nav-links { display: none; }
+    }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="nav">
+  <div class="nav-logo"><span>Vela</span> Management</div>
+  <div class="nav-links">
+    <div class="nav-link" onclick="scrollTo('opportunity')">Opportunity</div>
+    <div class="nav-link" onclick="scrollTo('leads')">Lead Gen</div>
+    <div class="nav-link" onclick="scrollTo('pitch')">The Pitch</div>
+    <div class="nav-link" onclick="scrollTo('operations')">Operations</div>
+    <div class="nav-link" onclick="scrollTo('stack')">Tech Stack</div>
+    <div class="nav-link" onclick="scrollTo('revenue')">Revenue</div>
+  </div>
+</div>
+
+<!-- HERO -->
+<div style="padding-top:70px">
+<div class="hero">
+  <div class="hero-badge">🏠 Full-Stack STR Management</div>
+  <h1>We manage Airbnbs.<br><span>Fully automated.</span></h1>
+  <div class="hero-sub">Vela finds underperforming Airbnb hosts in high-performing markets, closes them as clients, and manages their properties end-to-end using AI and automation.</div>
+  <div class="hero-stats">
+    <div>
+      <div class="hero-stat-val" style="color:#ff5a5f">20%</div>
+      <div class="hero-stat-label">Management fee per property</div>
+    </div>
+    <div>
+      <div class="hero-stat-val" style="color:#4ade80">$4,800</div>
+      <div class="hero-stat-label">Avg Denver listing monthly revenue</div>
+    </div>
+    <div>
+      <div class="hero-stat-val" style="color:#38bdf8">35+</div>
+      <div class="hero-stat-label">Markets we target globally</div>
+    </div>
+    <div>
+      <div class="hero-stat-val" style="color:#facc15">$9,600</div>
+      <div class="hero-stat-label">Our income at 10 properties</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<hr class="divider"/>
+
+<!-- OPPORTUNITY -->
+<div id="opportunity">
+<div class="section">
+  <div class="section-tag">The Opportunity</div>
+  <div class="section-title">Most Airbnb hosts are<br>leaving money on the table</div>
+  <div class="section-sub">In every high-performing market, a large percentage of listings earn far below their potential. That gap is our business.</div>
+  <div class="opp-grid">
+    <div class="opp-card">
+      <div class="opp-card-icon">📍</div>
+      <div class="opp-card-val" style="color:#38bdf8">72%</div>
+      <div class="opp-card-label">Average Denver market occupancy — the benchmark every host should hit</div>
+    </div>
+    <div class="opp-card">
+      <div class="opp-card-icon">📉</div>
+      <div class="opp-card-val" style="color:#f87171">44%</div>
+      <div class="opp-card-label">Average occupancy of underperforming listings in the same market</div>
+    </div>
+    <div class="opp-card">
+      <div class="opp-card-icon">💸</div>
+      <div class="opp-card-val" style="color:#fb923c">$2,700</div>
+      <div class="opp-card-label">Average monthly revenue gap between top and bottom performers</div>
+    </div>
+    <div class="opp-card">
+      <div class="opp-card-icon">🏘️</div>
+      <div class="opp-card-val" style="color:#4ade80">3,400+</div>
+      <div class="opp-card-label">Active Airbnb listings in Denver alone — our addressable lead pool</div>
+    </div>
+    <div class="opp-card">
+      <div class="opp-card-icon">🌍</div>
+      <div class="opp-card-val" style="color:#c084fc">35+</div>
+      <div class="opp-card-label">Global markets we can target using the same automated system</div>
+    </div>
+    <div class="opp-card">
+      <div class="opp-card-icon">🤖</div>
+      <div class="opp-card-val" style="color:#facc15">95%</div>
+      <div class="opp-card-label">Of the management workflow is automated — no large team needed to scale</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<hr class="divider"/>
+
+<!-- LEAD GEN -->
+<div id="leads">
+<div class="section">
+  <div class="section-tag">Lead Generation</div>
+  <div class="section-title">Fully automated pipeline<br>finds clients every week</div>
+  <div class="section-sub">Every Monday, the system scrapes listings, runs them through AirDNA comp analysis, filters underperformers, and sends personalized outreach — automatically.</div>
+
+  <div class="pipeline">
+
+    <div class="pipe-step">
+      <div class="pipe-left">
+        <div class="pipe-dot" style="background:#0e2d3d">📊</div>
+        <div class="pipe-line" style="background:#38bdf830"></div>
+      </div>
+      <div class="pipe-body">
+        <div class="pipe-title" style="color:#38bdf8">Step 1 — Market Data</div>
+        <div class="pipe-desc">We identify high-performing markets using AirDNA — occupancy, ADR, RevPAR by neighborhood. Denver averages 72% occupancy and $4,800/month per listing.</div>
+        <div class="pipe-tools">
+          <span class="pipe-tool" style="color:#38bdf8;border-color:#38bdf830;background:#0e2d3d">AirDNA</span>
+          <span class="pipe-tool" style="color:#38bdf8;border-color:#38bdf830;background:#0e2d3d">Inside Airbnb</span>
+          <span class="pipe-tool" style="color:#38bdf8;border-color:#38bdf830;background:#0e2d3d">Mashvisor</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="pipe-step">
+      <div class="pipe-left">
+        <div class="pipe-dot" style="background:#0e220e">🔍</div>
+        <div class="pipe-line" style="background:#4ade8030"></div>
+      </div>
+      <div class="pipe-body">
+        <div class="pipe-title" style="color:#4ade80">Step 2 — Comp Analysis</div>
+        <div class="pipe-desc">We filter the market using the proven 3-rule comp system: 250+ days available, 20+ reviews, active recent reviews. This gives us the true benchmark — what well-managed listings actually earn.</div>
+        <div class="pipe-tools">
+          <span class="pipe-tool" style="color:#4ade80;border-color:#4ade8030;background:#0e220e">AirDNA MarketMinder</span>
+          <span class="pipe-tool" style="color:#4ade80;border-color:#4ade8030;background:#0e220e">Make.com</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="pipe-step">
+      <div class="pipe-left">
+        <div class="pipe-dot" style="background:#221200">🎯</div>
+        <div class="pipe-line" style="background:#fb923c30"></div>
+      </div>
+      <div class="pipe-body">
+        <div class="pipe-title" style="color:#fb923c">Step 3 — Find Underperformers</div>
+        <div class="pipe-desc">We compare every listing against the comp benchmarks. Any listing earning significantly below market average is flagged as a lead — with a full diagnosis of why they're underperforming.</div>
+        <div class="pipe-tools">
+          <span class="pipe-tool" style="color:#fb923c;border-color:#fb923c30;background:#221200">Inside Airbnb Data</span>
+          <span class="pipe-tool" style="color:#fb923c;border-color:#fb923c30;background:#221200">Make.com Filter</span>
+          <span class="pipe-tool" style="color:#fb923c;border-color:#fb923c30;background:#221200">Airtable</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="pipe-step">
+      <div class="pipe-left">
+        <div class="pipe-dot" style="background:#1e0e1e">🤖</div>
+        <div class="pipe-line" style="background:#c084fc30"></div>
+      </div>
+      <div class="pipe-body">
+        <div class="pipe-title" style="color:#c084fc">Step 4 — AI Photo Enhancement</div>
+        <div class="pipe-desc">For listings with poor photos, we pull their images and run them through Higgsfield AI to generate enhanced sample photos and a property walkthrough video. This becomes part of the pitch — showing the host what their listing could look like.</div>
+        <div class="pipe-tools">
+          <span class="pipe-tool" style="color:#c084fc;border-color:#c084fc30;background:#1e0e1e">Higgsfield AI</span>
+          <span class="pipe-tool" style="color:#c084fc;border-color:#c084fc30;background:#1e0e1e">Stability AI</span>
+          <span class="pipe-tool" style="color:#c084fc;border-color:#c084fc30;background:#1e0e1e">Virtual Staging AI</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="pipe-step">
+      <div class="pipe-left">
+        <div class="pipe-dot" style="background:#222200">📧</div>
+      </div>
+      <div class="pipe-body">
+        <div class="pipe-title" style="color:#facc15">Step 5 — Personalized Outreach</div>
+        <div class="pipe-desc">Each host receives a personalized email showing their exact revenue gap, a diagnosis of why they're underperforming, and an AI-enhanced preview of what their listing could look like. 3-step sequence over 7 days.</div>
+        <div class="pipe-tools">
+          <span class="pipe-tool" style="color:#facc15;border-color:#facc1530;background:#222200">Instantly.ai</span>
+          <span class="pipe-tool" style="color:#facc15;border-color:#facc1530;background:#222200">ChatGPT API</span>
+          <span class="pipe-tool" style="color:#facc15;border-color:#facc1530;background:#222200">Make.com</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<hr class="divider"/>
+
+<!-- THE PITCH -->
+<div id="pitch">
+<div class="section">
+  <div class="section-tag">The Pitch</div>
+  <div class="section-title">We show up with their<br>data, not a sales script</div>
+  <div class="section-sub">Every outreach is personalized with the host's actual numbers — their revenue, their gap, and exactly why they're underperforming. This isn't cold outreach. It's a data intervention.</div>
+
+  <div class="ba-wrap">
+    <div class="ba-card" style="background:#140808;border:1px solid #f8717120">
+      <div class="ba-label" style="color:#f87171">Before — Current Performance</div>
+      <div class="ba-row"><div class="ba-row-label">Occupancy Rate</div><div class="ba-row-val" style="color:#f87171">44%</div></div>
+      <div class="ba-row"><div class="ba-row-label">Avg Nightly Rate</div><div class="ba-row-val" style="color:#f87171">$95 (flat)</div></div>
+      <div class="ba-row"><div class="ba-row-label">Monthly Revenue</div><div class="ba-row-val" style="color:#f87171">$1,200</div></div>
+      <div class="ba-row"><div class="ba-row-label">Dynamic Pricing</div><div class="ba-row-val" style="color:#f87171">None</div></div>
+      <div class="ba-row"><div class="ba-row-label">Response Time</div><div class="ba-row-val" style="color:#f87171">4+ hours</div></div>
+      <div class="ba-row"><div class="ba-row-label">Review Count</div><div class="ba-row-val" style="color:#f87171">8 reviews</div></div>
+    </div>
+    <div class="ba-card" style="background:#0d1a0d;border:1px solid #4ade8020">
+      <div class="ba-label" style="color:#4ade80">After — Vela Management</div>
+      <div class="ba-row"><div class="ba-row-label">Occupancy Rate</div><div class="ba-row-val" style="color:#4ade80">74%</div></div>
+      <div class="ba-row"><div class="ba-row-label">Avg Nightly Rate</div><div class="ba-row-val" style="color:#4ade80">$185 (dynamic)</div></div>
+      <div class="ba-row"><div class="ba-row-label">Monthly Revenue</div><div class="ba-row-val" style="color:#4ade80">$4,800</div></div>
+      <div class="ba-row"><div class="ba-row-label">Dynamic Pricing</div><div class="ba-row-val" style="color:#4ade80">PriceLabs ✓</div></div>
+      <div class="ba-row"><div class="ba-row-label">Response Time</div><div class="ba-row-val" style="color:#4ade80">&lt; 5 min (AI)</div></div>
+      <div class="ba-row"><div class="ba-row-label">Review Count</div><div class="ba-row-val" style="color:#4ade80">Growing weekly</div></div>
+    </div>
+  </div>
+
+  <div class="gap-card">
+    <div>
+      <div class="gap-num">$3,600</div>
+      <div class="gap-label">Monthly revenue gap we close for the host</div>
+    </div>
+    <div>
+      <div style="font-size:32px;font-weight:800;color:#fb923c">$43,200</div>
+      <div class="gap-label">Annual revenue gap</div>
+    </div>
+    <div>
+      <div style="font-size:32px;font-weight:800;color:#facc15">$9,600</div>
+      <div class="gap-label">Our annual fee at 20% (pays for itself)</div>
+    </div>
+  </div>
+
+  <div style="margin-top:32px">
+    <div class="section-tag" style="margin-bottom:16px">Why They're Underperforming — Auto-Diagnosed</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px">
+      <div style="background:#111;border:1px solid #1e1e1e;border-radius:12px;padding:18px">
+        <div style="font-size:20px;margin-bottom:8px">💰</div>
+        <div style="font-size:13px;font-weight:700;color:#fb923c;margin-bottom:4px">Flat Pricing</div>
+        <div style="font-size:12px;color:#555;line-height:1.5">Charging the same rate every night. Missing 40%+ revenue on high-demand weekends and events.</div>
+      </div>
+      <div style="background:#111;border:1px solid #1e1e1e;border-radius:12px;padding:18px">
+        <div style="font-size:20px;margin-bottom:8px">📸</div>
+        <div style="font-size:13px;font-weight:700;color:#c084fc;margin-bottom:4px">Poor Photos</div>
+        <div style="font-size:12px;color:#555;line-height:1.5">Low-quality images get skipped in search. Professional photos increase revenue by 40% on average.</div>
+      </div>
+      <div style="background:#111;border:1px solid #1e1e1e;border-radius:12px;padding:18px">
+        <div style="font-size:20px;margin-bottom:8px">🐌</div>
+        <div style="font-size:13px;font-weight:700;color:#f87171;margin-bottom:4px">Slow Response</div>
+        <div style="font-size:12px;color:#555;line-height:1.5">Airbnb penalizes slow hosts in search ranking. Response time above 1 hour loses bookings to competitors.</div>
+      </div>
+      <div style="background:#111;border:1px solid #1e1e1e;border-radius:12px;padding:18px">
+        <div style="font-size:20px;margin-bottom:8px">📅</div>
+        <div style="font-size:13px;font-weight:700;color:#38bdf8;margin-bottom:4px">Blocked Calendar</div>
+        <div style="font-size:12px;color:#555;line-height:1.5">Unnecessary blocked dates killing availability. Every blocked night is lost revenue with zero upside.</div>
+      </div>
+      <div style="background:#111;border:1px solid #1e1e1e;border-radius:12px;padding:18px">
+        <div style="font-size:20px;margin-bottom:8px">⭐</div>
+        <div style="font-size:13px;font-weight:700;color:#facc15;margin-bottom:4px">Few Reviews</div>
+        <div style="font-size:12px;color:#555;line-height:1.5">Low review count signals untrustworthiness. Guests book listings with social proof first.</div>
+      </div>
+      <div style="background:#111;border:1px solid #1e1e1e;border-radius:12px;padding:18px">
+        <div style="font-size:20px;margin-bottom:8px">📝</div>
+        <div style="font-size:13px;font-weight:700;color:#4ade80;margin-bottom:4px">Weak Listing</div>
+        <div style="font-size:12px;color:#555;line-height:1.5">Generic title and description fail to stand out. Strong copy converts browsers into bookers.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<hr class="divider"/>
+
+<!-- OPERATIONS -->
+<div id="operations">
+<div class="section">
+  <div class="section-tag">Operations</div>
+  <div class="section-title">Once signed, the property<br>runs on autopilot</div>
+  <div class="section-sub">Every touchpoint in the guest journey is automated. We only step in for exceptions — everything else handles itself.</div>
+
+  <div class="auto-grid">
+
+    <div class="auto-card">
+      <div class="auto-card-header">
+        <div class="auto-icon" style="background:#0e2d3d;font-size:20px">🔐</div>
+        <div><div class="auto-title">Check-In</div><div class="auto-sub">Fully automated</div></div>
+      </div>
+      <div class="auto-items">
+        <div class="auto-item"><div class="auto-dot" style="background:#38bdf8"></div>Unique smart lock code generated per guest, auto-expires at checkout</div>
+        <div class="auto-item"><div class="auto-dot" style="background:#38bdf8"></div>Check-in instructions sent automatically 24hrs before arrival</div>
+        <div class="auto-item"><div class="auto-dot" style="background:#38bdf8"></div>House rules, wifi, and local guide delivered on booking</div>
+        <div class="auto-item"><div class="auto-dot" style="background:#38bdf8"></div>Check-in confirmation logged when guest arrives</div>
+      </div>
+    </div>
+
+    <div class="auto-card">
+      <div class="auto-card-header">
+        <div class="auto-icon" style="background:#0e220e;font-size:20px">🧹</div>
+        <div><div class="auto-title">Cleaning</div><div class="auto-sub">Auto-scheduled via Turno</div></div>
+      </div>
+      <div class="auto-items">
+        <div class="auto-item"><div class="auto-dot" style="background:#4ade80"></div>Cleaner auto-notified via SMS the moment checkout is confirmed</div>
+        <div class="auto-item"><div class="auto-dot" style="background:#4ade80"></div>Photo report submitted after every clean — you get notified when done</div>
+        <div class="auto-item"><div class="auto-dot" style="background:#4ade80"></div>Supply restocking alerts flagged by cleaner automatically</div>
+        <div class="auto-item"><div class="auto-dot" style="background:#4ade80"></div>Cleaning quality scored via checklist per visit</div>
+      </div>
+    </div>
+
+    <div class="auto-card">
+      <div class="auto-card-header">
+        <div class="auto-icon" style="background:#221200;font-size:20px">🔧</div>
+        <div><div class="auto-title">Maintenance</div><div class="auto-sub">Right vendor, instantly</div></div>
+      </div>
+      <div class="auto-items">
+        <div class="auto-item"><div class="auto-dot" style="background:#fb923c"></div>Guest reports issue → maintenance ticket auto-created</div>
+        <div class="auto-item"><div class="auto-dot" style="background:#fb923c"></div>Right vendor auto-notified by SMS based on issue type</div>
+        <div class="auto-item"><div class="auto-dot" style="background:#fb923c"></div>Plumber, electrician, handyman — each on speed dial in the system</div>
+        <div class="auto-item"><div class="auto-dot" style="background:#fb923c"></div>Vendor texts "done" → ticket closes → host notified automatically</div>
+      </div>
+    </div>
+
+    <div class="auto-card">
+      <div class="auto-card-header">
+        <div class="auto-icon" style="background:#200a2a;font-size:20px">🎙️</div>
+        <div><div class="auto-title">Voice AI Agent</div><div class="auto-sub">24/7 guest support</div></div>
+      </div>
+      <div class="auto-items">
+        <div class="auto-item"><div class="auto-dot" style="background:#a855f7"></div>AI answers every guest call 24/7 — no human needed</div>
+        <div class="auto-item"><div class="auto-dot" style="background:#a855f7"></div>Handles: check-in questions, lockouts, house rules, checkout</div>
+        <div class="auto-item"><div class="auto-dot" style="background:#a855f7"></div>Escalates emergencies to us automatically</div>
+        <div class="auto-item"><div class="auto-dot" style="background:#a855f7"></div>Powered by Bland.ai or Vapi.ai — fully programmable</div>
+      </div>
+    </div>
+
+    <div class="auto-card">
+      <div class="auto-card-header">
+        <div class="auto-icon" style="background:#222200;font-size:20px">💰</div>
+        <div><div class="auto-title">Dynamic Pricing</div><div class="auto-sub">Adjusts daily automatically</div></div>
+      </div>
+      <div class="auto-items">
+        <div class="auto-item"><div class="auto-dot" style="background:#facc15"></div>PriceLabs adjusts nightly rate daily based on demand signals</div>
+        <div class="auto-item"><div class="auto-dot" style="background:#facc15"></div>Automatically raises prices for local events, holidays, weekends</div>
+        <div class="auto-item"><div class="auto-dot" style="background:#facc15"></div>Drops price strategically to fill gaps in the calendar</div>
+        <div class="auto-item"><div class="auto-dot" style="background:#facc15"></div>Average 35–40% revenue increase over flat pricing</div>
+      </div>
+    </div>
+
+    <div class="auto-card">
+      <div class="auto-card-header">
+        <div class="auto-icon" style="background:#071218;font-size:20px">📊</div>
+        <div><div class="auto-title">Reporting</div><div class="auto-sub">Monthly to every host</div></div>
+      </div>
+      <div class="auto-items">
+        <div class="auto-item"><div class="auto-dot" style="background:#67e8f9"></div>Monthly revenue report auto-generated and sent to host</div>
+        <div class="auto-item"><div class="auto-dot" style="background:#67e8f9"></div>Shows earnings, occupancy, and performance vs market</div>
+        <div class="auto-item"><div class="auto-dot" style="background:#67e8f9"></div>Builds trust and justifies management fee every month</div>
+        <div class="auto-item"><div class="auto-dot" style="background:#67e8f9"></div>Review count and rating trends tracked automatically</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- VOICE AI SCENARIOS -->
+  <div style="margin-top:48px">
+    <div class="section-tag" style="margin-bottom:8px">Voice AI — Guest Call Scenarios</div>
+    <div style="font-size:14px;color:#555;margin-bottom:20px">The AI handles every inbound call. Guests never know it's not a person.</div>
+    <div class="voice-grid">
+      <div class="voice-card">
+        <div class="voice-scenario">Guest calls: "I can't get in"</div>
+        <div class="voice-response">AI reads them their door code, confirms the address, offers to resend check-in instructions via text. Escalates to us only if code fails.</div>
+      </div>
+      <div class="voice-card">
+        <div class="voice-scenario">Guest calls: "The heat isn't working"</div>
+        <div class="voice-response">AI logs the issue, creates a maintenance ticket, notifies the HVAC vendor by SMS, and tells the guest someone will be there within 2 hours.</div>
+      </div>
+      <div class="voice-card">
+        <div class="voice-scenario">Guest calls: "Can I check out late?"</div>
+        <div class="voice-response">AI checks the calendar for the next booking. If there's a gap, approves the late checkout automatically. If not, politely declines with the standard time.</div>
+      </div>
+      <div class="voice-card">
+        <div class="voice-scenario">Guest calls: "There's a noise complaint"</div>
+        <div class="voice-response">AI logs the complaint, sends an alert to us, and sends the guest a message reminding them of quiet hours. Flags if Minut noise sensor confirms it.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<hr class="divider"/>
+
+<!-- TECH STACK -->
+<div id="stack">
+<div class="section">
+  <div class="section-tag">Technology Stack</div>
+  <div class="section-title">Every tool connected.<br>Everything automated.</div>
+  <div class="section-sub">Make.com connects the entire stack. Data flows automatically between every tool with no manual input required.</div>
+
+  <div class="flow">
+    <div class="flow-node colored" style="--c:#4ade80;--bg:#0e220e">Inside Airbnb</div>
+    <div class="flow-arr">→</div>
+    <div class="flow-node colored" style="--c:#38bdf8;--bg:#0e2d3d">AirDNA</div>
+    <div class="flow-arr">→</div>
+    <div class="flow-node colored" style="--c:#a855f7;--bg:#200a2a">Make.com</div>
+    <div class="flow-arr">→</div>
+    <div class="flow-node colored" style="--c:#fb923c;--bg:#221200">Airtable</div>
+    <div class="flow-arr">→</div>
+    <div class="flow-node colored" style="--c:#facc15;--bg:#222200">Instantly.ai</div>
+    <div class="flow-arr">→</div>
+    <div class="flow-node colored" style="--c:#c084fc;--bg:#1e0e1e">HubSpot</div>
+    <div class="flow-arr">→</div>
+    <div class="flow-node colored" style="--c:#4ade80;--bg:#0e220e">Signed ✓</div>
+  </div>
+
+  <div class="stack-grid">
+    <div class="stack-card">
+      <div class="stack-emoji">📊</div>
+      <div class="stack-name">AirDNA</div>
+      <div class="stack-role">Market data, comp analysis, revenue benchmarks</div>
+      <div class="stack-badge" style="background:#0e2d3d;color:#38bdf8">Research</div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-emoji">🏠</div>
+      <div class="stack-name">Inside Airbnb</div>
+      <div class="stack-role">Free open data — listing level performance data</div>
+      <div class="stack-badge" style="background:#0e220e;color:#4ade80">Free</div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-emoji">⚡</div>
+      <div class="stack-name">Make.com</div>
+      <div class="stack-role">Connects every tool — the automation backbone</div>
+      <div class="stack-badge" style="background:#200a2a;color:#a855f7">Automation</div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-emoji">🗃️</div>
+      <div class="stack-name">Airtable</div>
+      <div class="stack-role">Lead database, client pipeline, status tracking</div>
+      <div class="stack-badge" style="background:#221200;color:#fb923c">Database</div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-emoji">📧</div>
+      <div class="stack-name">Instantly.ai</div>
+      <div class="stack-role">Automated personalized cold email sequences</div>
+      <div class="stack-badge" style="background:#222200;color:#facc15">Outreach</div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-emoji">🤝</div>
+      <div class="stack-name">HubSpot</div>
+      <div class="stack-role">CRM — track deals from reply to signed</div>
+      <div class="stack-badge" style="background:#0e220e;color:#4ade80">Free</div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-emoji">🎙️</div>
+      <div class="stack-name">Bland.ai</div>
+      <div class="stack-role">Voice AI — handles all guest calls 24/7</div>
+      <div class="stack-badge" style="background:#200a2a;color:#a855f7">AI</div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-emoji">🤖</div>
+      <div class="stack-name">Higgsfield AI</div>
+      <div class="stack-role">AI photo/video enhancement for listing pitches</div>
+      <div class="stack-badge" style="background:#1e0e1e;color:#c084fc">AI</div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-emoji">💬</div>
+      <div class="stack-name">Hospitable</div>
+      <div class="stack-role">Automated guest messaging — full journey</div>
+      <div class="stack-badge" style="background:#1c0a0a;color:#f87171">Ops</div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-emoji">💰</div>
+      <div class="stack-name">PriceLabs</div>
+      <div class="stack-role">Dynamic pricing — adjusts nightly rates daily</div>
+      <div class="stack-badge" style="background:#222200;color:#facc15">Pricing</div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-emoji">🧹</div>
+      <div class="stack-name">Turno</div>
+      <div class="stack-role">Auto-schedules cleaners after every checkout</div>
+      <div class="stack-badge" style="background:#0e220e;color:#4ade80">Ops</div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-emoji">🔐</div>
+      <div class="stack-name">August/Schlage</div>
+      <div class="stack-role">Smart locks — auto-generates guest door codes</div>
+      <div class="stack-badge" style="background:#0e2d3d;color:#38bdf8">Hardware</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<hr class="divider"/>
+
+<!-- REVENUE MODEL -->
+<div id="revenue">
+<div class="section">
+  <div class="section-tag">Revenue Model</div>
+  <div class="section-title">Recurring income that<br>scales without more staff</div>
+  <div class="section-sub">We earn 20% of every property's monthly revenue. As we add clients, income compounds. The automation stack means we don't need to hire to scale.</div>
+
+  <div class="rev-grid">
+    <div class="rev-card">
+      <div class="rev-title">Monthly income at 10 properties</div>
+      <div class="rev-val" style="color:#ff5a5f">$9,600</div>
+      <div class="rev-sub">10 × $4,800 avg revenue × 20%</div>
+      <table class="rev-table">
+        <tr><td>5 properties</td><td style="color:#fb923c">$4,800/mo</td></tr>
+        <tr><td>10 properties</td><td style="color:#facc15">$9,600/mo</td></tr>
+        <tr><td>20 properties</td><td style="color:#4ade80">$19,200/mo</td></tr>
+        <tr><td>50 properties</td><td style="color:#38bdf8">$48,000/mo</td></tr>
+      </table>
+    </div>
+    <div class="rev-card">
+      <div class="rev-title">Monthly tool costs at 10 properties</div>
+      <div class="rev-val" style="color:#f87171">~$800</div>
+      <div class="rev-sub">Scales slowly — most tools are flat fee</div>
+      <table class="rev-table">
+        <tr><td>Hospitable</td><td>$40/mo</td></tr>
+        <tr><td>PriceLabs (10 listings)</td><td>$200/mo</td></tr>
+        <tr><td>Instantly.ai</td><td>$37/mo</td></tr>
+        <tr><td>Make.com</td><td>$29/mo</td></tr>
+        <tr><td>AirDNA</td><td>$80/mo</td></tr>
+        <tr><td>Bland.ai (Voice AI)</td><td>~$150/mo</td></tr>
+        <tr><td>Misc tools</td><td>~$150/mo</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div style="background:linear-gradient(135deg,#ff5a5f15,#4ade8015);border:1px solid #ff5a5f20;border-radius:20px;padding:36px;margin-top:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:24px">
+    <div>
+      <div style="font-size:14px;color:#555;margin-bottom:8px">Net monthly profit at 10 properties</div>
+      <div style="font-size:52px;font-weight:900;color:#4ade80">$8,800</div>
+      <div style="font-size:13px;color:#444;margin-top:4px">$9,600 revenue − $800 tools = $8,800/month</div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:14px;color:#555;margin-bottom:8px">Annual at 10 properties</div>
+      <div style="font-size:42px;font-weight:900;color:#facc15">$105,600</div>
+      <div style="font-size:13px;color:#444;margin-top:4px">Fully automated. No large team required.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="footer">
+  <div style="font-size:22px;font-weight:800;margin-bottom:8px"><span style="color:#ff5a5f">Vela</span> Management</div>
+  <div>Full-stack Airbnb management — automated from lead to lease</div>
+  <div style="margin-top:16px;display:flex;justify-content:center;gap:20px;flex-wrap:wrap">
+    <a href="index.html" style="color:#555;font-size:12px">Workflow →</a>
+    <a href="learn.html" style="color:#555;font-size:12px">Learning Roadmap →</a>
+  </div>
+</div>
+
+<script>
+  function scrollTo(id) {
+    document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
